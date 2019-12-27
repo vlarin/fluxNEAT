@@ -520,7 +520,7 @@ typename std::enable_if<
     void>::type
 NEAT<TaskType, ActivationFunction, SelectionPolicy>::Initialize()
 {
-  std::vector<ConnectionGene> connGeneList = task.startingGenome();
+  std::vector<ConnectionGene> connGeneList = task.StartingGenome();
   size_t maxInnovID = 0, maxNodeID = 0;
   for (size_t i = 0; i < connGeneList.size(); i++)
   {

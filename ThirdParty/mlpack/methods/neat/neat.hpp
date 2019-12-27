@@ -170,7 +170,7 @@ class NEAT
   //! Get the maximum number of generations for simplification.
   size_t MaxSimplifyGen() const { return maxSimplifyGen; }
   //! Set the maximum number of generations for simplification.
-  size_t MaxSimplifyGen() { return maxSimplifyGen; }
+  size_t& MaxSimplifyGen() { return maxSimplifyGen; }
 
   //! Get the current complexity ceiling.
   size_t CurrentComplexityCeiling() const { return currentComplexityCeiling; }

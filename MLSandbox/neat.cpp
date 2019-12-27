@@ -10,7 +10,7 @@ using namespace mlpack::neat;
 class XORTask
 {
 public:
-    std::vector<ConnectionGene> startingGenome()
+    std::vector<ConnectionGene> StartingGenome()
     {
         // The list of all connection genes.
         std::vector<ConnectionGene> connGeneList;
@@ -52,7 +52,7 @@ public:
     }
 };
 
-void tournamentSelectionTest();
+void TournamentSelectionTest();
 
 int main() {
     // Instantiate a task class instance.
@@ -65,7 +65,7 @@ int main() {
     model.ComplexityThreshold() = 6;
 
     // Optionally, we can set the number of simplification generations (this is 10  // by default)
-    //model.MaxSimplifyGen() = 15;
+    model.MaxSimplifyGen() = 15;
 
     // Initialize a genome to store the best genome.
     //Genome<> bestStepGenome;
@@ -82,10 +82,10 @@ int main() {
 
     mlpack::data::Save("neat.bin", "genome", bestGenome, false);
 
-    tournamentSelectionTest();
+    TournamentSelectionTest();
 }
 
-void tournamentSelectionTest()
+void TournamentSelectionTest()
 {
     XORTask task;
     NEAT<XORTask, mlpack::ann::HardSigmoidFunction, TournamentSelection> model(task, 2, 1, 100, 150, 10);
