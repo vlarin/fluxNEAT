@@ -6,5 +6,6 @@
 #include "neural_output.h"
 
 #include "augmented_sensor_unit.h"
+#include "activity_unit.h"
 
 #endif //FLUXNEAT_COMMON_H

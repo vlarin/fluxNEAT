@@ -9,12 +9,16 @@
 
 namespace flux {
 
-    class EXPORTED IActivityUnit {
+    /**
+     * Activity unit represents standard input -> output conversion unit
+     */
+    class EXPORTED IActivityUnit
+    {
     public:
-        virtual std::set<flux::NeuralInputId> GetInputIds() = 0;
-        virtual std::set<flux::NeuralOutputId> GetOutputIds() = 0;
+        virtual std::set<flux::NeuralInputId> GetInputIds() const = 0;
+        virtual std::set<flux::NeuralOutputId> GetOutputIds() const = 0;
 
-        virtual std::vector<NeuralOutput> Activate(std::vector<NeuralInput> inputs) = 0;
+        virtual std::vector<NeuralOutput> Activate(std::vector<NeuralInput> inputs) const = 0;
     };
 }
 

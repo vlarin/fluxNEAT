@@ -5,24 +5,26 @@
 
 namespace flux {
 
-    class EXPORTED NeuralOutputId {
+    class EXPORTED NeuralOutputId
+    {
     private:
         std::string id;
     public:
         explicit NeuralOutputId(std::string id);
 
-        std::string GetId() { return id; }
+        std::string GetId() const { return id; }
     };
 
-    class EXPORTED NeuralOutput {
+    class EXPORTED NeuralOutput
+    {
     private:
         NeuralOutputId output;
         float_fl value;
     public:
         explicit NeuralOutput(NeuralOutputId output);
 
-        NeuralOutputId GetOutput() { return output; }
-        float_fl GetValue() { return value; }
+        NeuralOutputId GetOutput() const { return output; }
+        float_fl GetValue() const { return value; }
 
         void Reset();
         void Apply(float_fl signal);

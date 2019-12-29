@@ -8,13 +8,16 @@
 
 namespace flux {
 
-    /// Input Augmentation interface acts like an additional sensor in the cortex
-    class EXPORTED IAugmentedSensorUnit {
+    /**
+     * Input Augmentation interface acts like an additional sensor in the cortex
+     */
+    class EXPORTED IAugmentedSensorUnit
+    {
     public:
-        virtual std::set<NeuralInputId> GetInputIds() = 0;
-        virtual std::set<NeuralInputId> GetAugmentedInputIds() = 0;
+        virtual std::set<NeuralInputId> GetInputIds() const = 0;
+        virtual std::set<NeuralInputId> GetAugmentedInputIds() const = 0;
 
-        virtual std::vector<NeuralInput> ApplyAugmentation(std::vector<NeuralInput> rawInputs) = 0;
+        virtual std::vector<NeuralInput> ApplyAugmentation(std::vector<NeuralInput> rawInputs) const = 0;
     };
 
 }
