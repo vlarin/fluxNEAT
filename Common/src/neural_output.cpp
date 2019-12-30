@@ -1,4 +1,4 @@
-#include "../include/flux/neural_output.h"
+#include <flux/neural_output.h>
 
 flux::NeuralOutputId::NeuralOutputId(std::string id) : id(std::move(id)) {
 }

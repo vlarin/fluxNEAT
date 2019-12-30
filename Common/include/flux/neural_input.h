@@ -1,11 +1,15 @@
+//
+// Copyright (c) 2019-2020 Temporal Games Inc. All rights reserved.
+//
+
 #ifndef FLUXNEAT_NEURAL_INPUT_H
 #define FLUXNEAT_NEURAL_INPUT_H
 
-#include "prereq.h"
+#include <flux/prereq.h>
 
 namespace flux {
 
-    class EXPORTED NeuralInputId
+    class FLUX_API NeuralInputId
     {
     private:
         std::string id;
@@ -15,7 +19,7 @@ namespace flux {
         std::string GetId() const { return id; }
     };
 
-    class EXPORTED NeuralInput
+    class FLUX_API NeuralInput
     {
     private:
         NeuralInputId input;

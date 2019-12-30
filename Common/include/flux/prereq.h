@@ -1,3 +1,7 @@
+//
+// Copyright (c) 2019-2020 Temporal Games Inc. All rights reserved.
+//
+
 #ifndef FLUXNEAT_PREREQ_H
 #define FLUXNEAT_PREREQ_H
 
@@ -11,25 +15,25 @@
 #ifdef FLUX_EXPORT
 // Exporting...
     #ifdef __GNUC__
-      #define EXPORTED __attribute__ ((dllexport))
+      #define FLUX_API __attribute__ ((dllexport))
     #else
-      #define EXPORTED __declspec(dllexport) // Note: actually gcc seems to also supports this syntax.
+      #define FLUX_API __declspec(dllexport) // Note: actually gcc seems to also supports this syntax.
     #endif
 #else
 #ifdef __GNUC__
-#define EXPORTED __attribute__ ((dllimport))
+#define FLUX_API __attribute__ ((dllimport))
 #else
-#define EXPORTED __declspec(dllimport) // Note: actually gcc seems to also supports this syntax.
+#define FLUX_API __declspec(dllimport) // Note: actually gcc seems to also supports this syntax.
 #endif
 #endif
-#define NOT_EXPORTED
+#define FLUX_API_HIDE
 #else
 #if __GNUC__ >= 4
-    #define EXPORTED __attribute__ ((visibility ("default")))
-    #define NOT_EXPORTED  __attribute__ ((visibility ("hidden")))
+    #define FLUX_API __attribute__ ((visibility ("default")))
+    #define FLUX_API_HIDE  __attribute__ ((visibility ("hidden")))
   #else
-    #define EXPORTED
-    #define NOT_EXPORTED
+    #define FLUX_API
+    #define FLUX_API_HIDE
   #endif
 #endif
 
