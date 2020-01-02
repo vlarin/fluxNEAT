@@ -1,14 +1,14 @@
 add_definitions("-DFLUX_EXPORT")
 
 add_library(fluxNEAT.Common SHARED
-        Common/include/flux/common.h
-        Common/src/neural_input.cpp
-        Common/src/neural_output.cpp
+        include/flux/common.h
+        src/neural_input.cpp
+        src/neural_output.cpp
 
-        Common/include/flux/raw_sensor_unit.h
-        Common/include/flux/augmented_sensor_unit.h
-        Common/include/flux/activity_unit.h
-        Common/include/flux/feedback/feedback_unit.h)
+        include/flux/raw_sensor_unit.h
+        include/flux/augmented_sensor_unit.h
+        include/flux/activity_unit.h
+        include/flux/feedback/feedback_unit.h)
 
 target_link_libraries(fluxNEAT.Common ${Boost_LIBRARIES})
 target_include_directories(fluxNEAT.Common PUBLIC ${CMAKE_SOURCE_DIR}/Common/include)

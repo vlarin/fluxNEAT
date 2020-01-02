@@ -16,7 +16,7 @@ include_directories(ThirdParty)
 include_directories(${Boost_INCLUDE_DIRS})
 
 # ML Sandbox
-include(MLSandbox/CMakeLists.txt)
+add_subdirectory(MLSandbox)
 
 # fluxNEAT Common
-include(Common/CMakeLists.txt)
+add_subdirectory(Common)

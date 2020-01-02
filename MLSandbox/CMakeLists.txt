@@ -1,5 +1,5 @@
 # NEAT
-add_executable(ML-NEAT-Sandbox MLSandbox/neat.cpp)
+add_executable(ML-NEAT-Sandbox neat.cpp)
 
 target_link_libraries(ML-NEAT-Sandbox ${Boost_LIBRARIES})
 
@@ -13,7 +13,7 @@ endif()
 #target_link_options(ML-NEAT-Sandbox PUBLIC LINKER:/VERBOSE)
 
 # BASIC
-add_executable(ML-RAW-Sandbox MLSandbox/main.cpp)
+add_executable(ML-RAW-Sandbox main.cpp)
 
 target_link_libraries(ML-RAW-Sandbox ${Boost_LIBRARIES})
 
