@@ -152,6 +152,49 @@ void NEAT<TaskType, ActivationFunction, SelectionPolicy>
   genome = genomeList[maxIdx];
 }
 
+template<class TaskType,
+         class ActivationFunction,
+         class SelectionPolicy>
+void NEAT<TaskType, ActivationFunction, SelectionPolicy>::ForceInit()
+{
+    // If this is true, the population has not been initialized.
+    if (genomeList.size() == 0)
+    {
+        Initialize();
+        speciesList = std::vector<std::vector<Genome<ActivationFunction>>>
+                (numSpecies);
+        Speciate(true);
+    }
+    else
+    {
+        Log::Warn("Population were already force initialized!")
+    }
+}
+
+template<class TaskType,
+        class ActivationFunction,
+        class SelectionPolicy>
+void NEAT<TaskType, ActivationFunction, SelectionPolicy>::
+        FinalizePreEvaluatedStep(Genome<ActivationFunction>& genome)
+{
+    Speciate(false);
+    Reproduce();
+
+    // Find best genome.
+    size_t maxIdx = 0;
+    double maxFitness = genomeList[0].Fitness();
+    for (size_t i = 1; i < popSize; i++)
+    {
+        if (genomeList[i].Fitness() > maxFitness)
+        {
+            maxIdx = i;
+            maxFitness = genomeList[i].Fitness();
+        }
+    }
+
+    genome = genomeList[maxIdx];
+}
+
 template <class TaskType,
           class ActivationFunction,
           class SelectionPolicy>

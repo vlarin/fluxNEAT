@@ -10,14 +10,17 @@
 #include <flux/prereq.h>
 #include <flux/neural_input.h>
 #include <flux/neural_output.h>
+#include <flux/context_unit.h>
 
 namespace flux {
 
     /**
      * Activity unit represents standard input -> output conversion unit
      */
-    class FLUX_API IActivityUnit
+    class FLUX_API IActivityUnit : public IContextUnit
     {
+    protected:
+        IActivityUnit(std::string id, std::shared_ptr<IContext> context) : IContextUnit(std::move(id), std::move(context)) {}
     public:
         virtual std::set<flux::NeuralInputId> GetInputIds() const = 0;
         virtual std::set<flux::NeuralOutputId> GetOutputIds() const = 0;

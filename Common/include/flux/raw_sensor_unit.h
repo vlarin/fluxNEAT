@@ -5,24 +5,28 @@
 #ifndef FLUXNEAT_RAW_SENSOR_UNIT_H
 #define FLUXNEAT_RAW_SENSOR_UNIT_H
 
-#include "prereq.h"
-#include "neural_input.h"
+#include <flux/prereq.h>
+#include <flux/neural_input.h>
+#include <flux/neural_output.h>
+#include <flux/context_unit.h>
 
 #include <set>
+#include <utility>
 
 namespace flux {
 
     /**
-     * Input Augmentation interface acts like an additional sensor in the cortex
+     * Raw Input Unit interface acts like a base sensor in the blackbox
      */
-    class FLUX_API IRawSensorUnit
+    class FLUX_API IRawSensorUnit : public IContextUnit
     {
+    protected:
+        IRawSensorUnit(std::string id, std::shared_ptr<IContext> context) : IContextUnit(std::move(id), std::move(context)) {}
     public:
         virtual std::set<NeuralInputId> GetInputIds() const = 0;
 
         virtual std::vector<NeuralInput> Fetch() const = 0;
     };
-
 }
 
 #endif //FLUXNEAT_RAW_SENSOR_UNIT_H
