@@ -14,9 +14,12 @@ namespace flux {
     private:
         std::string id;
     public:
+        NeuralOutputId() = default;
         explicit NeuralOutputId(std::string id);
 
         std::string GetId() const { return id; }
+
+        bool operator <(const NeuralOutputId &other) const { return id < other.id; }
     };
 
     class FLUX_API NeuralOutput
@@ -25,7 +28,9 @@ namespace flux {
         NeuralOutputId output;
         float_fl value;
     public:
+        NeuralOutput() = default;
         explicit NeuralOutput(NeuralOutputId output);
+        NeuralOutput(NeuralOutputId output, float_fl value);
 
         NeuralOutputId GetOutput() const { return output; }
         float_fl GetValue() const { return value; }

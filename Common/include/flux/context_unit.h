@@ -34,13 +34,14 @@ namespace flux {
     protected:
         IContextUnit(std::string id, std::shared_ptr<IContext> context)
         : _id(std::move(id)), _context(std::move(context)) {}
-
+        void Reset(std::string id, std::shared_ptr<IContext> context) { _id = std::move(id); _context = std::move(context); }
+    public:
         std::string GetId() const { return _id; }
         std::shared_ptr<IContext> GetContext() const { return _context; }
 
         IContextUnit Clone(std::shared_ptr<IContext> context) const;
-        virtual void UpdateScheme(const std::istream &istream) {}
-    public:
+        virtual void UpdateScheme(std::istream &istream) {}
+
         virtual ~IContextUnit() = default;
     };
 }

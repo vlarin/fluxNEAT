@@ -1,9 +1,15 @@
 #include <flux/neural_output.h>
 
-flux::NeuralOutputId::NeuralOutputId(std::string id) : id(std::move(id)) {
+flux::NeuralOutputId::NeuralOutputId(std::string id) : id(std::move(id))
+{
 }
 
-flux::NeuralOutput::NeuralOutput(flux::NeuralOutputId output) : output(std::move(output)), value(0) {
+flux::NeuralOutput::NeuralOutput(flux::NeuralOutputId output) : output(std::move(output)), value(0)
+{
+}
+
+flux::NeuralOutput::NeuralOutput(flux::NeuralOutputId output, float_fl value) : output(std::move(output)), value(value)
+{
 }
 
 void flux::NeuralOutput::Reset() {
@@ -13,3 +19,4 @@ void flux::NeuralOutput::Reset() {
 void flux::NeuralOutput::Apply(float_fl signal) {
     value += signal;
 }
+

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2020 Temporal Games Inc. All rights reserved.
+// Copyright (c) 2019-2020 Temporal Games Inc. All rights reserved.
 //
 
 #ifndef FLUXNEAT_MANUAL_RAW_INPUT_UNIT_H
