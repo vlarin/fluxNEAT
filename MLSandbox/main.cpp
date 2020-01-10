@@ -1,7 +1,4 @@
-#include <SDKDDKVer.h>
-
 #include <stdio.h>
-#include <tchar.h>
 
 #include <mlpack/core.hpp>
 #include "mlpack/methods/random_forest/random_forest.hpp"

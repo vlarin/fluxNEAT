@@ -99,6 +99,17 @@ class NEAT
   void Train(Genome<ActivationFunction>& genome);
 
   /**
+   * FLUX: Raw pre init of genome set. Used to spawn population for async evaluation
+   */
+  void ForceInit();
+
+  /**
+   * FLUX: Finalize evolution step with manually! evaulated genomes (async).
+   * @param genome best in population
+   */
+  void FinalizePreEvaluatedStep(Genome<ActivationFunction>& genome);
+
+  /**
    * Performs a single generation of NEAT.
    */
   void Step(Genome<ActivationFunction>& genome);
@@ -170,7 +181,7 @@ class NEAT
   //! Get the maximum number of generations for simplification.
   size_t MaxSimplifyGen() const { return maxSimplifyGen; }
   //! Set the maximum number of generations for simplification.
-  size_t MaxSimplifyGen() { return maxSimplifyGen; }
+  size_t& MaxSimplifyGen() { return maxSimplifyGen; }
 
   //! Get the current complexity ceiling.
   size_t CurrentComplexityCeiling() const { return currentComplexityCeiling; }
@@ -191,6 +202,18 @@ class NEAT
   Genome<ActivationFunction> StartingGenome() const { return startingGenome; }
   //! Set the starting genome.
   Genome<ActivationFunction>& StartingGenome() { return startingGenome; }
+
+  /**
+   * FLUX: Return raw genomes to perform async evaluation
+   * @return const reference to the genomes list
+   */
+  const std::vector<Genome<ActivationFunction>>& Genomes() { return genomeList; }
+
+  /**
+   * FLUX: Return raw genome's species clusters
+   * @return const reference to the species genomes list
+   */
+  const std::vector<std::vector<Genome<ActivationFunction>>>& SpeciesClusters() { return speciesList; }
 
   //! Get the number of contenders for tournament selection.
   size_t ContenderNum() const { return contenderNum; }
