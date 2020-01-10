@@ -1,11 +1,11 @@
 #include <flux/manual/single_activity_black_box.h>
 
-bool UpdateChildScheme(const std::string& childId, std::istream &istream, flux::IContextUnit &input);
+bool UpdateChildSchemeImpl(const std::string& childId, std::istream &istream, flux::IContextUnit &input);
 
 flux::SingleActivityBlackBox::SingleActivityBlackBox(
         const std::string &id,
         std::shared_ptr<IContext> context)
-        : IBlackBox(id, context) {}
+        : IBlackBox(id, std::move(context)) {}
 
 void flux::SingleActivityBlackBox::AddRawInput(std::shared_ptr<IRawSensorUnit> input)
 {
@@ -21,7 +21,7 @@ void flux::SingleActivityBlackBox::AddActivity(std::shared_ptr<IActivityUnit> ac
 {
     if (_activityUnit)
     {
-        throw std::exception("Activity unit have been already set!");
+        throw std::exception("Activity unit has already been set!");
     }
 
     _activityUnit = activity;
@@ -104,30 +104,30 @@ void flux::SingleActivityBlackBox::Step()
     }
 }
 
-void flux::SingleActivityBlackBox::UpdateScheme(std::string childId, std::istream &istream)
+void flux::SingleActivityBlackBox::UpdateChildScheme(std::string childId, std::istream &istream)
 {
-    if (_activityUnit && UpdateChildScheme(childId, istream, *_activityUnit))
+    if (_activityUnit && UpdateChildSchemeImpl(childId, istream, *_activityUnit))
     {
         return;
     }
 
     for (const auto &input : _rawInputs)
     {
-        if (UpdateChildScheme(childId, istream, *input)) return;
+        if (UpdateChildSchemeImpl(childId, istream, *input)) return;
     }
 
     for (const auto &input : _augmentedInputs)
     {
-        if (UpdateChildScheme(childId, istream, *input)) return;
+        if (UpdateChildSchemeImpl(childId, istream, *input)) return;
     }
 
     for (const auto &output : _outputs)
     {
-        if (UpdateChildScheme(childId, istream, *output)) return;
+        if (UpdateChildSchemeImpl(childId, istream, *output)) return;
     }
 }
 
-static bool UpdateChildScheme(const std::string& childId, std::istream &istream, flux::IContextUnit &input)
+static bool UpdateChildSchemeImpl(const std::string& childId, std::istream &istream, flux::IContextUnit &input)
 {
     if (input.GetId() == childId)
     {

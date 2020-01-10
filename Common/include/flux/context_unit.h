@@ -13,7 +13,7 @@
 namespace flux {
 
     /**
-     * Represents target to which block box's units are applied
+     * Represents target to which black box's units are applied
      */
     class FLUX_API IContext
     {
@@ -22,15 +22,15 @@ namespace flux {
     };
 
     /**
-     * Base class for all block box units. Contains target context.
+     * Base class for all black box units. Contains target context.
      * Base unit is made non-generic intentionally to avoid using templates for all core units,
      * thus making library header-only.
      */
     class FLUX_API IContextUnit
     {
     private:
+		std::string _id;
         std::shared_ptr<IContext> _context;
-        std::string _id;
     protected:
         IContextUnit(std::string id, std::shared_ptr<IContext> context)
         : _id(std::move(id)), _context(std::move(context)) {}

@@ -30,7 +30,7 @@ namespace flux {
         virtual void AddOutput(std::shared_ptr<IOutputUnit> output) = 0;
 
         virtual void Step() = 0;
-        virtual void UpdateScheme(std::string childId, std::istream &istream) = 0;
+        virtual void UpdateChildScheme(std::string childId, std::istream &istream) = 0;
     };
 }
 #endif //FLUXNEAT_BLACK_BOX_H

@@ -26,7 +26,7 @@ namespace flux {
 
         void Step() override;
 
-        void UpdateScheme(std::string childId, std::istream &istream) override;
+        void UpdateChildScheme(std::string childId, std::istream &istream) override;
 
     private:
         std::vector<std::shared_ptr<IRawSensorUnit>> _rawInputs;

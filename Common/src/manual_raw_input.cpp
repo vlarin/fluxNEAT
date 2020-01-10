@@ -5,8 +5,10 @@ using namespace flux;
 ManualRawInputSensor::ManualRawInputSensor(
         std::string id,
         std::shared_ptr<IContext> context,
-        std::set<NeuralInputId> inputIds)
-        : IRawSensorUnit(std::move(id), std::move(context)), _inputIds(std::move(inputIds)), _currentSequenceId(0)
+        std::set<NeuralInputId> inputIds,
+        bool verbose)
+        : IRawSensorUnit(std::move(id), std::move(context)), _inputIds(std::move(inputIds)), _currentSequenceId(0),
+        _verbose(verbose)
 {}
 
 std::vector<NeuralInput> ManualRawInputSensor::Fetch() const
@@ -16,7 +18,20 @@ std::vector<NeuralInput> ManualRawInputSensor::Fetch() const
         throw std::exception("Manual Input sequences are not initialized!");
     }
 
-    return _inputSequences[_currentSequenceId++ % _inputSequences.size()];
+    std::vector<NeuralInput> inputs = _inputSequences[_currentSequenceId++ % _inputSequences.size()];
+
+    //TODO: Own logger?
+    if (_verbose)
+    {
+        std::cout << "Manual black box input " << GetId() << ": ";
+        for (const auto &input : inputs)
+        {
+            std::cout << "[" << input.GetInputId().GetId() << ": " << input.GetValue() << "] ";
+        }
+        std::cout << std::endl;
+    }
+
+    return inputs;
 }
 
 void ManualRawInputSensor::SetInputs(const std::vector<NeuralInput> &inputs)

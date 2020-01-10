@@ -13,7 +13,7 @@ namespace flux {
      * Represents "empty" context that contains only debug name.
      * Note that only base units support unit context while other will fail with runtime error
      */
-    class FLUX_API UnitContext : public IContext
+    class UnitContext : public IContext
     {
     public:
         explicit UnitContext(std::string name) : _name(std::move(name)) {}

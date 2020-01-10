@@ -474,24 +474,6 @@ template <typename Archive>
 void Genome<ActivationFunction>::serialize(Archive& ar,
                                            const unsigned int /* version */)
 {
-  if (Archive::is_loading::value)
-  {
-    for (size_t i = 0; i < nextNodeID; i++)
-    {
-      directedGraph.emplace(std::piecewise_construct,
-                            std::make_tuple(i),
-                            std::make_tuple());
-    }
-
-    for (size_t i = 0; i < connectionGeneList.size(); i++)
-    {
-      size_t sourceID = connectionGeneList[i].Source();
-      size_t targetID = connectionGeneList[i].Target();
-      directedGraph[sourceID][targetID] = connectionGeneList[i];
-    }
-  }
-
-
   ar & BOOST_SERIALIZATION_NVP(inputNodeCount);
   ar & BOOST_SERIALIZATION_NVP(outputNodeCount);
   ar & BOOST_SERIALIZATION_NVP(nextNodeID);
@@ -514,6 +496,23 @@ void Genome<ActivationFunction>::serialize(Archive& ar,
     ar & BOOST_SERIALIZATION_NVP(nodeDepths);
   else
     ar & BOOST_SERIALIZATION_NVP(outputNodeValues);
+  
+  if (Archive::is_loading::value)
+  {
+	  for (size_t i = 0; i < nextNodeID; i++)
+	  {
+		  directedGraph.emplace(std::piecewise_construct,
+			  std::make_tuple(i),
+			  std::make_tuple());
+	  }
+
+	  for (size_t i = 0; i < connectionGeneList.size(); i++)
+	  {
+		  size_t sourceID = connectionGeneList[i].Source();
+		  size_t targetID = connectionGeneList[i].Target();
+		  directedGraph[sourceID][targetID] = connectionGeneList[i];
+	  }
+  }
 }
 
 } // namespace neat

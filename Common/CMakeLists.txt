@@ -1,5 +1,14 @@
 add_definitions("-DFLUX_EXPORT")
 
+generate_product_version(fluxNeat-Common-ProductVersionFiles
+        NAME fluxNEAT.Common
+        VERSION_MAJOR 0
+        VERSION_MINOR 1
+        VERSION_PATCH 0
+        VERSION_REVISION 0
+        COMPANY_COPYRIGHT "Temporal Games Inc. (c) Copyright 2019-2020. All rights reserved."
+        COMPANY_NAME "Temporal Games Inc.")
+
 add_library(fluxNEAT.Common SHARED
         include/flux/common.h
         src/neural_input.cpp
@@ -11,6 +20,8 @@ add_library(fluxNEAT.Common SHARED
         src/neat_activity_unit_impl.cpp
 
         src/include/neat_activity_unit_impl.h
+
+        ${fluxNeat-Common-ProductVersionFiles}
 
         include/flux/black_box.h
         include/flux/context_unit.h
