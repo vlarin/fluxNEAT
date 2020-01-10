@@ -25,6 +25,21 @@ include_directories(${Boost_INCLUDE_DIRS})
 # Windows Proprietary Support
 include(generate_product_version)
 
+# Git Revision
+execute_process(COMMAND git log --pretty=format:'%h' -n 1
+        OUTPUT_VARIABLE GIT_REV
+        ERROR_QUIET)
+
+# Check whether we got any revision (which isn't
+# always the case, e.g. when someone downloaded a zip
+# file from Github instead of a checkout or just no git properly installed)
+if ("${GIT_REV}" STREQUAL "")
+    set(GIT_REV "0")
+else()
+    string(STRIP "${GIT_REV}" GIT_REV)
+    string(SUBSTRING "${GIT_REV}" 1 7 GIT_REV)
+endif()
+
 # ML Sandbox
 add_subdirectory(MLSandbox)
 

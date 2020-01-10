@@ -5,7 +5,8 @@ generate_product_version(fluxNeat-Common-ProductVersionFiles
         VERSION_MAJOR 0
         VERSION_MINOR 1
         VERSION_PATCH 0
-        VERSION_REVISION 0
+        VERSION_REVISION ${GIT_REV}
+        FILE_DESCRIPTION "fluxNEAT AI Common Library"
         COMPANY_COPYRIGHT "Temporal Games Inc. (c) Copyright 2019-2020. All rights reserved."
         COMPANY_NAME "Temporal Games Inc.")
 
