@@ -9,6 +9,7 @@
 #include <flux/neural_input.h>
 #include <flux/neural_output.h>
 
+#include <flux/context_registry.h>
 #include <flux/raw_sensor_unit.h>
 #include <flux/augmented_sensor_unit.h>
 #include <flux/activity_unit.h>

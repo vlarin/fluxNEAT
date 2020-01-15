@@ -21,6 +21,8 @@ namespace flux {
         void SetInputs(const std::vector<NeuralInput> &inputs);
         void SetInputsSequence(std::vector<std::vector<NeuralInput>> inputSequence);
 
+        std::shared_ptr<IContextUnit> Clone(std::shared_ptr<IContext> context) const override;
+
     private:
         bool _verbose;
         mutable uint8_t _currentSequenceId;

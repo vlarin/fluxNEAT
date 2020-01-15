@@ -35,19 +35,23 @@ void flux::SingleActivityBlackBox::AddOutput(std::shared_ptr<IOutputUnit> output
 void flux::SingleActivityBlackBox::Step()
 {
     //TODO: validation
-    std::map<NeuralInputId, NeuralInput> inputs;
+    for (auto &input : _sensors)
+    {
+        input.second.Reset();
+    }
+
     for (const auto &input : _rawInputs)
     {
         std::vector<NeuralInput> raw = input->Fetch();
         for (const auto &rawInput : raw)
         {
-            if (inputs.find(rawInput.GetInputId()) == inputs.end())
+            if (_sensors.find(rawInput.GetInputId()) == _sensors.end())
             {
-                inputs.insert(std::make_pair(rawInput.GetInputId(), rawInput));
+                _sensors.insert(std::make_pair(rawInput.GetInputId(), rawInput));
             }
             else
             {
-                inputs[rawInput.GetInputId()].Apply(rawInput.GetValue());
+                _sensors[rawInput.GetInputId()].Apply(rawInput.GetValue());
             }
         }
     }
@@ -57,24 +61,24 @@ void flux::SingleActivityBlackBox::Step()
         std::vector<NeuralInput> augmentedPreInputs;
         for (const auto &augmentedId : input->GetAugmentedInputIds())
         {
-            if (inputs.find(augmentedId) == inputs.end())
+            if (_sensors.find(augmentedId) == _sensors.end())
             {
                 throw std::exception(("Unable to fetch raw input id of - " + augmentedId.GetId()).c_str());
             }
 
-            augmentedPreInputs.emplace_back(inputs[augmentedId]);
+            augmentedPreInputs.emplace_back(_sensors[augmentedId]);
         }
 
         std::vector<NeuralInput> raw = input->ApplyAugmentation(augmentedPreInputs);
         for (const auto &rawInput : raw)
         {
-            if (inputs.find(rawInput.GetInputId()) == inputs.end())
+            if (_sensors.find(rawInput.GetInputId()) == _sensors.end())
             {
-                inputs.insert(std::make_pair(rawInput.GetInputId(), rawInput));
+                _sensors.insert(std::make_pair(rawInput.GetInputId(), rawInput));
             }
             else
             {
-                inputs[rawInput.GetInputId()].Apply(rawInput.GetValue());
+                _sensors[rawInput.GetInputId()].Apply(rawInput.GetValue());
             }
         }
     }
@@ -87,20 +91,34 @@ void flux::SingleActivityBlackBox::Step()
     std::vector<NeuralInput> preInputs;
     for (const auto &inputId : _activityUnit->GetInputIds())
     {
-        if (inputs.find(inputId) == inputs.end())
+        if (_sensors.find(inputId) == _sensors.end())
         {
             throw std::exception(("Unable to fetch input id of - " + inputId.GetId()).c_str());
         }
 
-        preInputs.emplace_back(inputs[inputId]);
+        preInputs.emplace_back(_sensors[inputId]);
     }
 
-
     std::vector<NeuralOutput> outputs = _activityUnit->Activate(preInputs);
-
     for (const auto &output : _outputs)
     {
         output->Apply(outputs);
+    }
+
+    for (auto &output : _responses)
+    {
+        output.second.Reset();
+    }
+    for (const auto &outputValue : outputs)
+    {
+        if (_responses.find(outputValue.GetOutputId()) == _responses.end())
+        {
+            _responses.insert(std::make_pair(outputValue.GetOutputId(), outputValue));
+        }
+		else
+		{
+			_responses[outputValue.GetOutputId()].Apply(outputValue.GetValue());			
+		}
     }
 }
 
@@ -125,6 +143,52 @@ void flux::SingleActivityBlackBox::UpdateChildScheme(std::string childId, std::i
     {
         if (UpdateChildSchemeImpl(childId, istream, *output)) return;
     }
+}
+
+std::shared_ptr<flux::IContextUnit> flux::SingleActivityBlackBox::Clone(std::shared_ptr<IContext> context) const
+{
+    std::shared_ptr<SingleActivityBlackBox> clone = CloneToContext<SingleActivityBlackBox>(context);
+    for (int i = 0; i < clone->_rawInputs.size(); i++)
+    {
+        clone->_rawInputs[i] = std::reinterpret_pointer_cast<IRawSensorUnit>(_rawInputs[i]->Clone(context));
+    }
+    for (int i = 0; i < clone->_augmentedInputs.size(); i++)
+    {
+        clone->_augmentedInputs[i] = std::reinterpret_pointer_cast<IAugmentedSensorUnit>(_augmentedInputs[i]->Clone(context));
+    }
+    for (int i = 0; i < clone->_outputs.size(); i++)
+    {
+        clone->_outputs[i] = std::reinterpret_pointer_cast<IOutputUnit>(_outputs[i]->Clone(context));
+    }
+
+    if (_activityUnit)
+    {
+        clone->_activityUnit = std::reinterpret_pointer_cast<IActivityUnit>(_activityUnit->Clone(context));
+    }
+
+    return clone;
+}
+
+const flux::NeuralInput &flux::SingleActivityBlackBox::GetInputOf(std::string id) const
+{
+    auto input = _sensors.find(NeuralInputId(id));
+    if (input == _sensors.end())
+    {
+        throw std::exception(("Unable to fetch input id of - " + id).c_str());
+    }
+
+    return input->second;
+}
+
+const flux::NeuralOutput &flux::SingleActivityBlackBox::GetOutputOf(std::string id) const
+{
+    auto output = _responses.find(NeuralOutputId(id));
+    if (output == _responses.end())
+    {
+        throw std::exception(("Unable to fetch output id of - " + id).c_str());
+    }
+
+    return output->second;
 }
 
 static bool UpdateChildSchemeImpl(const std::string& childId, std::istream &istream, flux::IContextUnit &input)

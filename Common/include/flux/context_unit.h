@@ -31,17 +31,27 @@ namespace flux {
     private:
 		std::string _id;
         std::shared_ptr<IContext> _context;
+
     protected:
         IContextUnit(std::string id, std::shared_ptr<IContext> context)
         : _id(std::move(id)), _context(std::move(context)) {}
+
+        template <typename TContextUnit>
+        std::shared_ptr<TContextUnit> CloneToContext(std::shared_ptr<IContext> context) const
+        {
+            TContextUnit clone = *reinterpret_cast<const TContextUnit *>(this);
+            clone._context = std::move(context);
+            std::unique_ptr<TContextUnit> clone_ref = std::unique_ptr<TContextUnit>(new TContextUnit(clone));
+
+            return clone_ref;
+        }
         void Reset(std::string id, std::shared_ptr<IContext> context) { _id = std::move(id); _context = std::move(context); }
     public:
         std::string GetId() const { return _id; }
         std::shared_ptr<IContext> GetContext() const { return _context; }
 
-        IContextUnit Clone(std::shared_ptr<IContext> context) const;
+        virtual std::shared_ptr<IContextUnit> Clone(std::shared_ptr<IContext> context) const = 0;
         virtual void UpdateScheme(std::istream &istream) {}
-
         virtual ~IContextUnit() = default;
     };
 }

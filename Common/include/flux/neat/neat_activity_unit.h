@@ -6,6 +6,7 @@
 #define FLUXNEAT_NEAT_ACTIVITY_UNIT_H
 
 #include <flux/prereq.h>
+#include <flux/context_unit.h>
 #include <flux/activity_unit.h>
 
 namespace flux {
@@ -24,6 +25,7 @@ namespace flux {
 
         std::vector<NeuralOutput> Activate(const std::vector<NeuralInput> &inputs) const override;
 
+        std::shared_ptr<IContextUnit> Clone(std::shared_ptr<IContext> context) const override;
         void UpdateScheme(std::istream &istream) override;
 
         ~NeatActivityUnit() override;

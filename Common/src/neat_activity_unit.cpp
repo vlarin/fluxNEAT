@@ -79,3 +79,8 @@ flux::NeatActivityUnit &flux::NeatActivityUnit::operator=(const flux::NeatActivi
 
     return *this;
 }
+
+std::shared_ptr<flux::IContextUnit> flux::NeatActivityUnit::Clone(std::shared_ptr<IContext> context) const
+{
+    return CloneToContext<NeatActivityUnit>(context);
+}

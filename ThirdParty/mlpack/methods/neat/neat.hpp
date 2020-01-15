@@ -205,9 +205,9 @@ class NEAT
 
   /**
    * FLUX: Return raw genomes to perform async evaluation
-   * @return const reference to the genomes list
+   * @return reference to the genomes list
    */
-  const std::vector<Genome<ActivationFunction>>& Genomes() { return genomeList; }
+  std::vector<Genome<ActivationFunction>>& Genomes() { return genomeList; }
 
   /**
    * FLUX: Return raw genome's species clusters
