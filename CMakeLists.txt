@@ -46,5 +46,8 @@ add_subdirectory(MLSandbox)
 # fluxNEAT Common
 add_subdirectory(Common)
 
+# fluxNEAT Evolution Training
+add_subdirectory(Training)
+
 # fluxNEAT Console Sandbox
 add_subdirectory(Sandbox)

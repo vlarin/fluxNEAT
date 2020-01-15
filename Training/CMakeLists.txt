@@ -1,0 +1,39 @@
+add_definitions("-DFLUX_EXPORT")
+
+generate_product_version(fluxNeat-Training-ProductVersionFiles
+        NAME fluxNEAT.Training
+        VERSION_MAJOR 0
+        VERSION_MINOR 1
+        VERSION_PATCH 0
+        VERSION_REVISION ${GIT_REV}
+        FILE_DESCRIPTION "fluxNEAT AI Evolution Training Library"
+        COMPANY_COPYRIGHT "Temporal Games Inc. (c) Copyright 2019-2020. All rights reserved."
+        COMPANY_NAME "Temporal Games Inc.")
+
+add_library(fluxNEAT.Training
+        include/flux/training.h
+        include/flux/training/neat_evolution_params.h
+        include/flux/training/neat_activity_trainer.h
+        include/flux/training/evaluation_output_unit.h
+
+        ${fluxNeat-Training-ProductVersionFiles}
+
+        src/include/neat_activity_trainer_impl.h
+
+        src/neat_evolution_params.cpp
+        src/neat_activity_trainer.cpp
+        src/neat_activity_trainer_impl.cpp)
+
+target_link_libraries(fluxNEAT.Training ${Boost_LIBRARIES})
+target_include_directories(fluxNEAT.Training PUBLIC ${CMAKE_SOURCE_DIR}/Common/include)
+target_include_directories(fluxNEAT.Training PUBLIC ${CMAKE_SOURCE_DIR}/Training/include)
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    target_link_libraries(fluxNEAT.Training ${CMAKE_SOURCE_DIR}/ThirdParty/libs/mlpack-gd.lib)
+else()
+    target_link_libraries(fluxNEAT.Training ${CMAKE_SOURCE_DIR}/ThirdParty/libs/mlpack.lib)
+endif()
+
+target_link_libraries(fluxNEAT.Training fluxNEAT.Common)
+
+#target_link_options(fluxNEAT.Training PUBLIC LINKER:/FORCE)
