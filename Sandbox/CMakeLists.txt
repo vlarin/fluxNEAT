@@ -13,6 +13,7 @@ add_executable(fluxNEAT.Sandbox main.cpp ${fluxNeat-Sandbox-ProductVersionFiles}
 
 target_link_libraries(fluxNEAT.Sandbox ${Boost_LIBRARIES})
 target_link_libraries(fluxNEAT.Sandbox fluxNEAT.Common)
+target_link_libraries(fluxNEAT.Sandbox fluxNEAT.Training)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     target_link_libraries(fluxNEAT.Sandbox ${CMAKE_SOURCE_DIR}/ThirdParty/libs/mlpack-gd.lib)

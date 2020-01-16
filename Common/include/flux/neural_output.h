@@ -32,7 +32,7 @@ namespace flux {
         explicit NeuralOutput(NeuralOutputId output);
         NeuralOutput(NeuralOutputId output, float_fl value);
 
-        NeuralOutputId GetOutput() const { return output; }
+        NeuralOutputId GetOutputId() const { return output; }
         float_fl GetValue() const { return value; }
 
         void Reset();

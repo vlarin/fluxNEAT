@@ -70,4 +70,4 @@
 *.umap filter=lfs diff=lfs merge=lfs -text
 
 # Anything in `/RawContent` dir.
-# <Unreal Root>/RawContent/**/* filter=lfs diff=lfs merge=lfs -text
+/UnrealAISandbox/RawContent/**/* filter=lfs diff=lfs merge=lfs -text

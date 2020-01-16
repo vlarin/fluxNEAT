@@ -29,6 +29,9 @@ namespace flux {
         virtual void AddActivity(std::shared_ptr<IActivityUnit> activity) = 0;
         virtual void AddOutput(std::shared_ptr<IOutputUnit> output) = 0;
 
+        virtual const NeuralInput &GetInputOf(std::string id) const = 0;
+        virtual const NeuralOutput &GetOutputOf(std::string id) const = 0;
+
         virtual void Step() = 0;
         virtual void UpdateChildScheme(std::string childId, std::istream &istream) = 0;
     };

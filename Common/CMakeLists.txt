@@ -10,7 +10,7 @@ generate_product_version(fluxNeat-Common-ProductVersionFiles
         COMPANY_COPYRIGHT "Temporal Games Inc. (c) Copyright 2019-2020. All rights reserved."
         COMPANY_NAME "Temporal Games Inc.")
 
-add_library(fluxNEAT.Common SHARED
+add_library(fluxNEAT.Common
         include/flux/common.h
         src/neural_input.cpp
         src/neural_output.cpp
@@ -34,7 +34,8 @@ add_library(fluxNEAT.Common SHARED
         include/flux/manual/unit_context.h
         include/flux/manual/manual_raw_input_unit.h
         include/flux/manual/single_activity_black_box.h
-        include/flux/neat/neat_activity_unit.h  )
+        include/flux/neat/neat_activity_unit.h
+        include/flux/context_registry.h)
 
 target_link_libraries(fluxNEAT.Common ${Boost_LIBRARIES})
 target_include_directories(fluxNEAT.Common PUBLIC ${CMAKE_SOURCE_DIR}/Common/include)
@@ -45,4 +46,4 @@ else()
     target_link_libraries(fluxNEAT.Common ${CMAKE_SOURCE_DIR}/ThirdParty/libs/mlpack.lib)
 endif()
 
-target_link_options(fluxNEAT.Common PUBLIC LINKER:/FORCE)
+#target_link_options(fluxNEAT.Common PUBLIC LINKER:/FORCE)

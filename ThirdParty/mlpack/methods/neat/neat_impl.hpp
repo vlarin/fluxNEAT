@@ -167,7 +167,7 @@ void NEAT<TaskType, ActivationFunction, SelectionPolicy>::ForceInit()
     }
     else
     {
-        Log::Warn("Population were already force initialized!")
+        Log::Warn << "Population were already force initialized!";
     }
 }
 

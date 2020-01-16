@@ -34,7 +34,7 @@ class ConnectionGene
    * @param target The target of the connection.
    * @param enabled Denotes whether the connection is enabled or not.
    */
-  ConnectionGene(const size_t globalInnovationID,
+  inline ConnectionGene(const size_t globalInnovationID,
                  const double weight,
                  const size_t source,
                  const size_t target,
@@ -43,23 +43,23 @@ class ConnectionGene
   /**
    * Default constructor.
    */
-  ConnectionGene();
+  inline ConnectionGene();
 
   /**
    * Default destructor.
-   */ 
-  ~ConnectionGene();
+   */
+  inline ~ConnectionGene();
 
   /**
    * Mutate the weights of the gene.
    *
    * @param mutationSize The strength of mutation noise to be added.
    */
-  void Mutate(const double mutationSize);
+  inline void Mutate(const double mutationSize);
 
   //! Serialize the model.
   template<typename Archive>
-  void serialize(Archive& ar, const unsigned int /* version */);
+  inline void serialize(Archive& ar, const unsigned int /* version */);
 
   //! Get global innovation ID.
   size_t InnovationID() const { return globalInnovationID; }

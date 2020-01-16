@@ -62,5 +62,4 @@ void ConnectionGene::serialize(Archive& ar,
 
 } // namespace neat
 } // namespace mlpack
-
 #endif

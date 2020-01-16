@@ -1,4 +1,5 @@
 #include <flux/manual/manual_raw_input_unit.h>
+#include <iostream>
 
 using namespace flux;
 
@@ -47,4 +48,9 @@ void ManualRawInputSensor::SetInputsSequence(std::vector<std::vector<NeuralInput
     //TODO: ids validation?
     _inputSequences = std::move(inputSequence);
     _currentSequenceId = 0;
+}
+
+std::shared_ptr<IContextUnit> ManualRawInputSensor::Clone(std::shared_ptr<IContext> context) const
+{
+    return CloneToContext<ManualRawInputSensor>(context);
 }

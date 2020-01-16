@@ -6,11 +6,19 @@
 #define FLUXNEAT_PREREQ_H
 
 #include <cmath>
-#include <armadillo>
 
+#include <string>
+
+#include <map>
+#include <set>
+#include <vector>
+
+#include <memory>
 #include <utility>
 
-// Define EXPORTED for any platform
+// Define DLL export support for any platform
+#define FLUX_SHARED 0
+#if FLUX_SHARED
 #if defined _WIN32 || defined __CYGWIN__
 #ifdef FLUX_EXPORT
 // Exporting...
@@ -36,11 +44,15 @@
     #define FLUX_API_HIDE
   #endif
 #endif
+#else
+#define FLUX_API
+#define FLUX_API_HIDE
+#endif
 
 namespace flux {
 
-    /* Defines standard floating point type used by fluxNEAT */
-    using float_fl = std::remove_reference_t<decltype(arma::vec().at(0))>;
+    /* Defines standard floating point type used by fluxNEAT (must match armadillo float type) */
+    using float_fl = double;
 
 } // namespace flux
 #endif //FLUXNEAT_PREREQ_H
