@@ -1,6 +1,6 @@
 #include <flux/manual/single_activity_black_box.h>
 
-bool UpdateChildSchemeImpl(const std::string& childId, std::istream &istream, flux::IContextUnit &input);
+static bool UpdateChildSchemeImpl(const std::string& childId, std::istream &istream, flux::IContextUnit &input);
 
 flux::SingleActivityBlackBox::SingleActivityBlackBox(
         const std::string &id,
@@ -21,7 +21,8 @@ void flux::SingleActivityBlackBox::AddActivity(std::shared_ptr<IActivityUnit> ac
 {
     if (_activityUnit)
     {
-        throw std::exception("Activity unit has already been set!");
+        setLastError("Activity unit has already been set!");
+        return;
     }
 
     _activityUnit = activity;
@@ -63,7 +64,8 @@ void flux::SingleActivityBlackBox::Step()
         {
             if (_sensors.find(augmentedId) == _sensors.end())
             {
-                throw std::exception(("Unable to fetch raw input id of - " + augmentedId.GetId()).c_str());
+                //throw std::exception(("Unable to fetch raw input id of - " + augmentedId.GetId()).c_str());
+                return;
             }
 
             augmentedPreInputs.emplace_back(_sensors[augmentedId]);
@@ -85,7 +87,8 @@ void flux::SingleActivityBlackBox::Step()
 
     if (!_activityUnit)
     {
-        throw std::exception("Activity unit has to be set!");
+        setLastError("Activity unit has to be set!");
+        return;
     }
 
     std::vector<NeuralInput> preInputs;
@@ -93,7 +96,8 @@ void flux::SingleActivityBlackBox::Step()
     {
         if (_sensors.find(inputId) == _sensors.end())
         {
-            throw std::exception(("Unable to fetch input id of - " + inputId.GetId()).c_str());
+            setLastError(("Unable to fetch input id of - " + inputId.GetId()).c_str());
+            return;
         }
 
         preInputs.emplace_back(_sensors[inputId]);
@@ -150,20 +154,20 @@ std::shared_ptr<flux::IContextUnit> flux::SingleActivityBlackBox::Clone(std::sha
     std::shared_ptr<SingleActivityBlackBox> clone = CloneToContext<SingleActivityBlackBox>(context);
     for (int i = 0; i < clone->_rawInputs.size(); i++)
     {
-        clone->_rawInputs[i] = std::reinterpret_pointer_cast<IRawSensorUnit>(_rawInputs[i]->Clone(context));
+        clone->_rawInputs[i] = std::static_pointer_cast<IRawSensorUnit>(_rawInputs[i]->Clone(context));
     }
     for (int i = 0; i < clone->_augmentedInputs.size(); i++)
     {
-        clone->_augmentedInputs[i] = std::reinterpret_pointer_cast<IAugmentedSensorUnit>(_augmentedInputs[i]->Clone(context));
+        clone->_augmentedInputs[i] = std::static_pointer_cast<IAugmentedSensorUnit>(_augmentedInputs[i]->Clone(context));
     }
     for (int i = 0; i < clone->_outputs.size(); i++)
     {
-        clone->_outputs[i] = std::reinterpret_pointer_cast<IOutputUnit>(_outputs[i]->Clone(context));
+        clone->_outputs[i] = std::static_pointer_cast<IOutputUnit>(_outputs[i]->Clone(context));
     }
 
     if (_activityUnit)
     {
-        clone->_activityUnit = std::reinterpret_pointer_cast<IActivityUnit>(_activityUnit->Clone(context));
+        clone->_activityUnit = std::static_pointer_cast<IActivityUnit>(_activityUnit->Clone(context));
     }
 
     return clone;
@@ -174,7 +178,9 @@ const flux::NeuralInput &flux::SingleActivityBlackBox::GetInputOf(std::string id
     auto input = _sensors.find(NeuralInputId(id));
     if (input == _sensors.end())
     {
-        throw std::exception(("Unable to fetch input id of - " + id).c_str());
+        static const NeuralInput empty(NeuralInputId("__invalid_input__"));
+        setLastError(("Unable to fetch input id of - " + id).c_str());
+        return empty;
     }
 
     return input->second;
@@ -185,7 +191,9 @@ const flux::NeuralOutput &flux::SingleActivityBlackBox::GetOutputOf(std::string 
     auto output = _responses.find(NeuralOutputId(id));
     if (output == _responses.end())
     {
-        throw std::exception(("Unable to fetch output id of - " + id).c_str());
+        static const NeuralOutput empty(NeuralOutputId("__invalid_output__"));
+        setLastError(("Unable to fetch output id of - " + id).c_str());
+        return empty;
     }
 
     return output->second;

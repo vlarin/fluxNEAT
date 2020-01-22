@@ -15,6 +15,9 @@
 
 #include <memory>
 #include <utility>
+#include <exception>
+
+#include <flux/global_error.h>
 
 // Define DLL export support for any platform
 #define FLUX_SHARED 0
@@ -47,6 +50,22 @@
 #else
 #define FLUX_API
 #define FLUX_API_HIDE
+#endif
+
+#if __cplusplus <= 201103L && _MSC_VER < 1500
+namespace std {
+/**
+ *  std::make_unique replacement for C++11
+ *
+ *  @param args the arguments to make_unique (forwarded)
+ *
+ *  @return the unique pointer
+ */
+    template<typename T, typename... Args>
+    std::unique_ptr<T> make_unique(Args &&... args) {
+        return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+    }
+}
 #endif
 
 namespace flux {

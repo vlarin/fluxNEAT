@@ -15,7 +15,7 @@ class XorContext : public UnitContext
 {
 public:
     explicit XorContext(const std::shared_ptr<ManualRawInputSensor>& origin) : UnitContext("xor"),
-                                                                        _inputStub(*std::reinterpret_pointer_cast<ManualRawInputSensor>(origin->Clone(origin->GetContext())))  {}
+                                                                        _inputStub(*std::static_pointer_cast<ManualRawInputSensor>(origin->Clone(origin->GetContext())))  {}
 
     std::vector<NeuralInput> getWorldInputs() { return  _inputStub.Fetch(); }
 private:
@@ -30,7 +30,7 @@ public:
 
     void Apply(const std::vector<flux::NeuralOutput> &outputs) const override
     {
-        auto world = std::reinterpret_pointer_cast<XorContext>(GetContext())->getWorldInputs();
+        auto world = std::static_pointer_cast<XorContext>(GetContext())->getWorldInputs();
         float_fl answer = (world[0].GetValue() + world[1].GetValue()) * (!world[0].GetValue() + !world[1].GetValue());
 
         //cout << "Black box activation result:" << endl;

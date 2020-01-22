@@ -42,7 +42,7 @@ public class UnrealAISandbox : ModuleRules
     {
         bool isLibrarySupported = false;
 
-        if ((Target.Platform == UnrealTargetPlatform.Win64))// || (Target.Platform == UnrealTargetPlatform.Win32))
+        if ((Target.Platform == UnrealTargetPlatform.Win64) || (Target.Platform == UnrealTargetPlatform.Win32))
         {
             isLibrarySupported = true;
 
@@ -59,6 +59,25 @@ public class UnrealAISandbox : ModuleRules
             PublicAdditionalLibraries.Add(Path.Combine(LibrariesPath, PlatformString, "fluxNEAT.Training.lib"));
             PublicAdditionalLibraries.Add(Path.Combine(LibrariesPath, PlatformString, "mlpack.lib"));
             PublicAdditionalLibraries.Add(Path.Combine(LibrariesPath, PlatformString, "libboost_serialization-vc141-mt-x64-1_71.lib"));
+        }
+        
+        if (Target.Platform == UnrealTargetPlatform.Mac)
+        {
+            isLibrarySupported = true;
+
+            string PlatformString = "Mac";
+            string LibrariesPath = Path.Combine(ThirdPartyPath, "Libraries");
+
+            /*
+            test your path with:
+            using System; // Console.WriteLine("");
+            Console.WriteLine("... LibrariesPath -> " + LibrariesPath);
+            */
+
+            PublicAdditionalLibraries.Add(Path.Combine(LibrariesPath, PlatformString, "libfluxNEAT.Common.a"));
+            PublicAdditionalLibraries.Add(Path.Combine(LibrariesPath, PlatformString, "libfluxNEAT.Training.a"));
+            PublicAdditionalLibraries.Add(Path.Combine(LibrariesPath, PlatformString, "libmlpack.a"));
+            PublicAdditionalLibraries.Add(Path.Combine(LibrariesPath, PlatformString, "libboost_serialization.a"));
         }
 
         if (isLibrarySupported)

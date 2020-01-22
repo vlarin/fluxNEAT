@@ -16,7 +16,7 @@ class XorContext : public UnitContext
 {
 public:
 	explicit XorContext(const std::shared_ptr<ManualRawInputSensor>& origin) : UnitContext("xor"),
-		_inputStub(*std::reinterpret_pointer_cast<ManualRawInputSensor>(origin->Clone(origin->GetContext()))) {}
+		_inputStub(*std::static_pointer_cast<ManualRawInputSensor>(origin->Clone(origin->GetContext()))) {}
 
 	std::vector<NeuralInput> getWorldInputs() { return  _inputStub.Fetch(); }
 
@@ -29,11 +29,11 @@ class DebugOutputUnit : public IEvaluationOutputUnit
 {
 public:
 	DebugOutputUnit(const string &id, const shared_ptr<IContext> &context) : IEvaluationOutputUnit(id, context),
-		_error(0), _evalutionCount(0) {}
+		_evalutionCount(0), _error(0) {}
 
 	void Apply(const std::vector<flux::NeuralOutput> &outputs) const override
 	{
-		auto world = std::reinterpret_pointer_cast<XorContext>(GetContext())->getWorldInputs();
+		auto world = std::static_pointer_cast<XorContext>(GetContext())->getWorldInputs();
 		float_fl answer = (world[0].GetValue() + world[1].GetValue()) * (!world[0].GetValue() + !world[1].GetValue());
 
 		for (const auto &output : outputs)

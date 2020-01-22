@@ -19,6 +19,7 @@ add_library(fluxNEAT.Common
         src/single_activity_black_box.cpp
         src/neat_activity_unit.cpp
         src/neat_activity_unit_impl.cpp
+        src/global_error.cpp
 
         src/include/neat_activity_unit_impl.h
 
@@ -35,15 +36,24 @@ add_library(fluxNEAT.Common
         include/flux/manual/manual_raw_input_unit.h
         include/flux/manual/single_activity_black_box.h
         include/flux/neat/neat_activity_unit.h
-        include/flux/context_registry.h)
+        include/flux/context_registry.h
+        include/flux/global_error.h)
 
 target_link_libraries(fluxNEAT.Common ${Boost_LIBRARIES})
 target_include_directories(fluxNEAT.Common PUBLIC ${CMAKE_SOURCE_DIR}/Common/include)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    target_link_libraries(fluxNEAT.Common ${CMAKE_SOURCE_DIR}/ThirdParty/libs/mlpack-gd.lib)
+    if (MACOSX)
+        target_link_libraries(fluxNEAT.Common ${CMAKE_SOURCE_DIR}/ThirdParty/libs/libmlpack-gd.a)
+    else()
+        target_link_libraries(fluxNEAT.Common ${CMAKE_SOURCE_DIR}/ThirdParty/libs/mlpack-gd.lib)
+    endif()
 else()
-    target_link_libraries(fluxNEAT.Common ${CMAKE_SOURCE_DIR}/ThirdParty/libs/mlpack.lib)
+    if (MACOSX)
+        target_link_libraries(fluxNEAT.Common ${CMAKE_SOURCE_DIR}/ThirdParty/libs/libmlpack.a)
+    else()
+        target_link_libraries(fluxNEAT.Common ${CMAKE_SOURCE_DIR}/ThirdParty/libs/mlpack.lib)
+    endif()
 endif()
 
 #target_link_options(fluxNEAT.Common PUBLIC LINKER:/FORCE)

@@ -16,7 +16,8 @@ std::vector<NeuralInput> ManualRawInputSensor::Fetch() const
 {
     if (_inputSequences.empty())
     {
-        throw std::exception("Manual Input sequences are not initialized!");
+        setLastError("Manual Input sequences are not initialized!");
+        return std::vector<NeuralInput>();
     }
 
     std::vector<NeuralInput> inputs = _inputSequences[_currentSequenceId++ % _inputSequences.size()];

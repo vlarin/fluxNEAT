@@ -2,6 +2,8 @@
 
 #include <utility>
 
+static flux::NeatEmptyTask empty;
+
 flux::NeatActivityTrainer::NeatActivityTrainerImpl::NeatActivityTrainerImpl(size_t populationSize,
         size_t numSpecies,
         size_t parallelPoolSize,
@@ -18,7 +20,7 @@ flux::NeatActivityTrainer::NeatActivityTrainerImpl::NeatActivityTrainerImpl(size
         _trainingProto(std::move(trainingProto)),
         _trainingPool(std::move(trainingPool)),
         _targetId(target->GetId()),
-        _training(NeatEmptyTask(), target->GetInputIds().size(), target->GetOutputIds().size(), populationSize,
+        _training(empty, target->GetInputIds().size(), target->GetOutputIds().size(), populationSize,
                 0 /** dest fitness */ ,
                 numSpecies,
                 1 /** initial weight */,
@@ -118,8 +120,8 @@ void flux::NeatActivityTrainer::NeatActivityTrainerImpl::EndEpoch()
 void flux::NeatActivityTrainer::NeatActivityTrainerImpl::EmplaceForEvaluation(EvaluationEntry entry)
 {
     std::shared_ptr<IContext> slot = _trainingPool->RetrieveContext();
-    entry.FitnessEvaluatorUnit = std::reinterpret_pointer_cast<IEvaluationOutputUnit>(_trainingFitnessUnitProto->Clone(slot));
-    entry.Entity = std::reinterpret_pointer_cast<IBlackBox>(_trainingProto->Clone(slot));
+    entry.FitnessEvaluatorUnit = std::static_pointer_cast<IEvaluationOutputUnit>(_trainingFitnessUnitProto->Clone(slot));
+    entry.Entity = std::static_pointer_cast<IBlackBox>(_trainingProto->Clone(slot));
     entry.Entity->AddOutput(entry.FitnessEvaluatorUnit);
 
     std::stringstream stream;
