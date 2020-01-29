@@ -39,7 +39,7 @@ namespace flux {
         template <typename TContextUnit>
         std::shared_ptr<TContextUnit> CloneToContext(std::shared_ptr<IContext> context) const
         {
-            TContextUnit clone = *reinterpret_cast<const TContextUnit *>(this);
+            TContextUnit clone = *static_cast<const TContextUnit *>(this);
             clone._context = std::move(context);
             std::unique_ptr<TContextUnit> clone_ref = std::unique_ptr<TContextUnit>(new TContextUnit(clone));
 

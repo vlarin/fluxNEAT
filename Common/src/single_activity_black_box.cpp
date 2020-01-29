@@ -64,7 +64,7 @@ void flux::SingleActivityBlackBox::Step()
         {
             if (_sensors.find(augmentedId) == _sensors.end())
             {
-                //throw std::exception(("Unable to fetch raw input id of - " + augmentedId.GetId()).c_str());
+                setLastError(("Unable to fetch raw input id of - " + augmentedId.GetId()).c_str());
                 return;
             }
 
