@@ -109,7 +109,7 @@ void APlatformAndBoxesSandbox::Tick(float DeltaTime)
 				if (_attempt >= EvaluationAttempts - 1 && !IsTesting)
 				{
 					_isDead = true;
-					UE_LOG(LogActor, Warning, TEXT("Actor fitness if %f"), _fitness);
+					UE_LOG(LogActor, Warning, TEXT("Actor fitness is %f"), _fitness);
 					return;
 				}
 

@@ -124,7 +124,6 @@ static TArray<uint8> LoadFromFile(FString name)
 	TArray<uint8> res;
 	FString SaveDirectory = FString("E:/");
 	FString FileName = name;
-	bool AllowOverwriting = true;
 
 	IPlatformFile& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
 
@@ -137,10 +136,14 @@ static TArray<uint8> LoadFromFile(FString name)
 		FString AbsoluteFilePath = SaveDirectory + "/" + FileName;
 
 		// Allow overwriting or file doesn't already exist
-		if (AllowOverwriting || !PlatformFile.FileExists(*AbsoluteFilePath))
+		if (PlatformFile.FileExists(*AbsoluteFilePath))
 		{
 			FFileHelper::LoadFileToArray(res, *AbsoluteFilePath);
 		}
+        else
+        {
+            UE_LOG(LogActor, Error, TEXT("Unable to open champion!"))
+        }
 	}
 	return res;
 }

@@ -10,5 +10,7 @@ PlatformBoxesContext::PlatformBoxesContext(APlatformAndBoxesSandbox *sandbox, ui
 
 std::string PlatformBoxesContext::GetName() const
 {
-	return "Context " + _sandbox->GetUniqueID();
+    char buff[40];
+	snprintf(buff, 40, "Context %d", _sandbox->GetUniqueID());
+    return std::string(buff);
 }
