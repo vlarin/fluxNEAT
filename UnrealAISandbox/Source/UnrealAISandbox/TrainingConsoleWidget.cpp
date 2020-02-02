@@ -1,5 +1,7 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
+//
+// Copyright (c) 2019-2020 Temporal Games Inc. All rights reserved.
+//
+//
 #include "TrainingConsoleWidget.h"
 
 #include <flux/common.h>
@@ -18,7 +20,7 @@ public:
 	explicit XorContext(const std::shared_ptr<ManualRawInputSensor>& origin) : UnitContext("xor"),
 		_inputStub(*std::static_pointer_cast<ManualRawInputSensor>(origin->Clone(origin->GetContext()))) {}
 
-	std::vector<NeuralInput> getWorldInputs() { return  _inputStub.Fetch(); }
+	std::vector<NeuralInput> GetWorldInputs() const { return  _inputStub.Fetch(); }
 
 	~XorContext() = default;
 private:
@@ -33,7 +35,7 @@ public:
 
 	void Apply(const std::vector<flux::NeuralOutput> &outputs) const override
 	{
-		auto world = std::static_pointer_cast<XorContext>(GetContext())->getWorldInputs();
+		auto world = std::static_pointer_cast<XorContext>(GetContext())->GetWorldInputs();
 		float_fl answer = (world[0].GetValue() + world[1].GetValue()) * (!world[0].GetValue() + !world[1].GetValue());
 
 		for (const auto &output : outputs)

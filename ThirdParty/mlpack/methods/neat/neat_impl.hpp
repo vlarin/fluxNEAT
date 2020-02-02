@@ -160,6 +160,9 @@ void NEAT<TaskType, ActivationFunction, SelectionPolicy>::ForceInit()
     // If this is true, the population has not been initialized.
     if (genomeList.size() == 0)
     {
+        Genome<ActivationFunction>::nextInnovID = 0;
+        Genome<ActivationFunction>::mutationBuffer.clear();
+
         Initialize();
         speciesList = std::vector<std::vector<Genome<ActivationFunction>>>
                 (numSpecies);

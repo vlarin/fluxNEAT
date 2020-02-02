@@ -1,9 +1,13 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+//
+// Copyright (c) 2019-2020 Temporal Games Inc. All rights reserved.
+//
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+
+#include "PlatformBoxes/PlatformAndBoxesTrainer.h"
 
 #include <flux/training/neat_activity_trainer.h>
 
@@ -26,6 +30,9 @@ public:
 	// Optionally override the tick event
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI Config")
+	TSubclassOf<APlatformAndBoxesTrainer> TrainerPrefab;
+	
 	//Fire a Weapon
 	UFUNCTION(BlueprintCallable, Category = "Handlers")
 	void OnTrainingClick();
