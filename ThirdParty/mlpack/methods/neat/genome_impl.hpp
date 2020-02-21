@@ -348,6 +348,10 @@ void Genome<ActivationFunction>::AddConnMutation()
         newTarget));
     directedGraph[sourceID].emplace(newTarget, ConnectionGene(innovID,
         1, sourceID, newTarget));
+
+
+	// Update connection count.
+	connCount++;
   }
   else
   {
@@ -359,15 +363,15 @@ void Genome<ActivationFunction>::AddConnMutation()
         if (connectionGeneList[j].Source() == sourceID &&
             connectionGeneList[j].Target() == newTarget)
         {
-          connectionGeneList[j].Enabled() = false;
+          connectionGeneList[j].Enabled() = true;
           break;
         }
       }
+
+	  // Update connection count.
+	  connCount++;
     }
   }
-
-  // Update connection count.
-  connCount++;
 }
 
 // Add node.
@@ -464,8 +468,11 @@ void Genome<ActivationFunction>::DelConnMutation()
       Traverse(j);
   }
 
-  // Update connection count.
-  connCount--;
+  if (connCount > 0)
+  {
+	  // Update connection count.
+	  connCount--;
+  }
 }
 
 // Serializes object.

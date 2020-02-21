@@ -3,7 +3,7 @@
 void flux::NeatActivityUnit::NeatActivityUnitImpl::UpdateScheme(std::istream &istream)
 {
     //TODO: catch exceptions..
-    boost::archive::binary_iarchive ar(istream);
+    boost::archive::text_iarchive ar(istream);
     ar >> _genome;
 }
 

@@ -3,7 +3,7 @@ add_definitions("-DFLUX_EXPORT")
 generate_product_version(fluxNeat-Training-ProductVersionFiles
         NAME fluxNEAT.Training
         VERSION_MAJOR 0
-        VERSION_MINOR 1
+        VERSION_MINOR 2
         VERSION_PATCH 0
         VERSION_REVISION ${GIT_REV}
         FILE_DESCRIPTION "fluxNEAT AI Evolution Training Library"
