@@ -178,24 +178,47 @@ template<class TaskType,
         class ActivationFunction,
         class SelectionPolicy>
 void NEAT<TaskType, ActivationFunction, SelectionPolicy>::
-        FinalizePreEvaluatedStep(Genome<ActivationFunction>& genome)
+        FinalizePreEvaluatedStep(size_t generation, Genome<ActivationFunction>& genome)
 {
+	meanComplexity = 0;
+
+	// Find best genome.
+	size_t maxIdx = 0;
+	double maxFitness = genomeList[0].Fitness();
+	for (size_t i = 1; i < popSize; i++)
+	{
+		meanComplexity += (double)genomeList[i].Complexity() / popSize;
+		if (genomeList[i].Fitness() > maxFitness)
+		{
+			maxIdx = i;
+			maxFitness = genomeList[i].Fitness();
+		}
+	}
+
+	genome = genomeList[maxIdx];
+
+	// Set search mode.
+	if (meanComplexity > currentComplexityCeiling)
+	{
+		if (searchMode == 0)
+			lastTransitionGen = generation;
+		searchMode = 1;
+	}
+	else
+	{
+		if (searchMode == 1)
+			lastTransitionGen = generation;
+		searchMode = 0;
+	}
+
+	if (lastTransitionGen + maxSimplifyGen == generation && searchMode == 1)
+	{
+		currentComplexityCeiling += complexityThreshold;
+		searchMode = 0;
+	}
+	
     Speciate(false);
     Reproduce();
-
-    // Find best genome.
-    size_t maxIdx = 0;
-    double maxFitness = genomeList[0].Fitness();
-    for (size_t i = 1; i < popSize; i++)
-    {
-        if (genomeList[i].Fitness() > maxFitness)
-        {
-            maxIdx = i;
-            maxFitness = genomeList[i].Fitness();
-        }
-    }
-
-    genome = genomeList[maxIdx];
 }
 
 template <class TaskType,

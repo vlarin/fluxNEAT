@@ -32,9 +32,25 @@ namespace flux {
                 const std::shared_ptr<IContextRegistry>& trainingPool);
 
         bool IsEpochCompleted() const;
-        float_t GetChampionFitness() const;
+        size_t GetCurrentEpoch() const;
 
-        void Step();
+		bool IsComplexifying() const;
+        float_fl GetBestFitness() const;
+        float_fl GetChampionFitness() const;
+        float_fl GetMeanFitness() const;
+        float_fl GetMeanComplexity() const;
+        float_fl GetMeanEvaluationDuration() const;
+
+        float_fl GetEvaluationPerSec() const;
+        float_fl GetTotalEvaluations() const;
+        float_fl GetTotalEvaluationTime() const;
+
+        const NeatEvolutionParameters &GetEvolutionParameters() const;
+
+        NeatEntityDescriptor GetChampionEntity() const;
+        std::vector<NeatEntityDescriptor> GetCurrentEntities() const;
+
+        void Step(float_fl delta);
 
         void SaveCurrentChampionActivity(std::ostream &stream) const;
         void SaveEvolutionState(std::ostream &stream) const;

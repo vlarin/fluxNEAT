@@ -22,9 +22,19 @@ bool flux::NeatActivityTrainer::IsEpochCompleted() const
     return _impl->IsEpochCompleted();
 }
 
-void flux::NeatActivityTrainer::Step()
+size_t flux::NeatActivityTrainer::GetCurrentEpoch() const
 {
-    _impl->Step();
+    return _impl->GetCurrentEpoch();
+}
+
+bool flux::NeatActivityTrainer::IsComplexifying() const
+{
+	return _impl->IsComplexifying();
+}
+
+void flux::NeatActivityTrainer::Step(flux::float_fl delta)
+{
+    _impl->Step(delta);
 }
 
 void flux::NeatActivityTrainer::SaveCurrentChampionActivity(std::ostream &stream) const
@@ -42,9 +52,59 @@ void flux::NeatActivityTrainer::LoadEvolutionState(std::istream &stream)
     _impl->LoadEvolutionState(stream);
 }
 
-float_t flux::NeatActivityTrainer::GetChampionFitness() const
+flux::float_fl flux::NeatActivityTrainer::GetChampionFitness() const
 {
     return _impl->GetChampionFitness();
+}
+
+flux::NeatEntityDescriptor flux::NeatActivityTrainer::GetChampionEntity() const
+{
+    return _impl->GetChampionEntity();
+}
+
+std::vector<flux::NeatEntityDescriptor> flux::NeatActivityTrainer::GetCurrentEntities() const
+{
+    return _impl->GetCurrentEntities();
+}
+
+flux::float_fl flux::NeatActivityTrainer::GetBestFitness() const
+{
+    return _impl->GetBestFitness();
+}
+
+flux::float_fl flux::NeatActivityTrainer::GetMeanFitness() const
+{
+    return _impl->GetMeanFitness();
+}
+
+flux::float_fl flux::NeatActivityTrainer::GetMeanComplexity() const
+{
+    return _impl->GetMeanComplexity();
+}
+
+flux::float_fl flux::NeatActivityTrainer::GetEvaluationPerSec() const
+{
+    return _impl->GetEvaluationPerSec();
+}
+
+flux::float_fl flux::NeatActivityTrainer::GetTotalEvaluations() const
+{
+    return _impl->GetTotalEvaluations();
+}
+
+flux::float_fl flux::NeatActivityTrainer::GetTotalEvaluationTime() const
+{
+    return _impl->GetTotalEvaluationTime();
+}
+
+flux::float_fl flux::NeatActivityTrainer::GetMeanEvaluationDuration() const
+{
+    return _impl->GetMeanEvaluationDuration();
+}
+
+const flux::NeatEvolutionParameters &flux::NeatActivityTrainer::GetEvolutionParameters() const
+{
+    return _impl->GetEvolutionParameters();
 }
 
 flux::NeatActivityTrainer::~NeatActivityTrainer() = default;

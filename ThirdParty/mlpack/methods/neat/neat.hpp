@@ -107,7 +107,7 @@ class NEAT
    * FLUX: Finalize evolution step with manually! evaulated genomes (async).
    * @param genome best in population
    */
-  void FinalizePreEvaluatedStep(Genome<ActivationFunction>& genome);
+  void FinalizePreEvaluatedStep(size_t generation, Genome<ActivationFunction>& genome);
 
   /**
    * Performs a single generation of NEAT.
@@ -193,6 +193,8 @@ class NEAT
   //! Set the mean complexity.
   double& MeanComplexity() { return meanComplexity; }
 
+  bool IsComplexifying() const { return searchMode == 0; }
+
   //! Get the boolean denoting if the genome is acyclic or not.
   bool IsAcyclic() const { return isAcyclic; }
   //! Set the boolean denoting if the genome is acyclic or not.
@@ -213,7 +215,7 @@ class NEAT
    * FLUX: Return raw genome's species clusters
    * @return const reference to the species genomes list
    */
-  const std::vector<std::vector<Genome<ActivationFunction>>>& SpeciesClusters() { return speciesList; }
+  const std::vector<std::vector<Genome<ActivationFunction>>>& SpeciesClusters() const { return speciesList; }
 
   //! Get the number of contenders for tournament selection.
   size_t ContenderNum() const { return contenderNum; }

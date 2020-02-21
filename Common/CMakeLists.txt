@@ -19,6 +19,7 @@ add_library(fluxNEAT.Common
         src/single_activity_black_box.cpp
         src/neat_activity_unit.cpp
         src/neat_activity_unit_impl.cpp
+        src/neat_entity_descriptor.cpp
         src/global_error.cpp
 
         src/include/neat_activity_unit_impl.h
@@ -36,6 +37,7 @@ add_library(fluxNEAT.Common
         include/flux/manual/manual_raw_input_unit.h
         include/flux/manual/single_activity_black_box.h
         include/flux/neat/neat_activity_unit.h
+        include/flux/neat/neat_entity_descriptor.h
         include/flux/context_registry.h
         include/flux/global_error.h)
 

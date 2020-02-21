@@ -115,30 +115,33 @@ int main()
 
     std::shared_ptr<ContextRegistry> registry = std::make_shared<ContextRegistry>(manualInput);
     NeatEvolutionParameters evolutionParameters;
-    NeatActivityTrainer trainer(150, 10, 1, 6, 10, evolutionParameters,
+    evolutionParameters.IsAcyclic = false;
+    NeatActivityTrainer trainer(150, 15, 1, 2, 10, evolutionParameters,
             neatActivity,
             output,
             blackBox,
             registry);
 
     cout << "Initializing complete. Enabling black box..." << endl;
-    trainer.Step();
+    trainer.Step(1);
 
     cout << "Enabling. Starting training..." << endl;
-    int epoch = 0;
     while (trainer.GetChampionFitness() < 3.95)
     {
         while (!trainer.IsEpochCompleted()) {
-            trainer.Step();
+            trainer.Step(1);
         }
-        cout << "Completed " << ++epoch << " epoch" << endl;
-        trainer.Step();
+        cout << "Completed " << trainer.GetCurrentEpoch() << " epoch. Current Champion - " << trainer.GetChampionFitness()
+    	<< ". IsComplexifying - " << (trainer.IsComplexifying() ? "true" : "false") << "." << endl;
+        trainer.Step(1);
     }
-    cout << "Training completed by " << epoch << " epochs." << endl;
+    cout << "Training completed by " << trainer.GetCurrentEpoch() << " epochs." << endl;
 
     std::stringstream stream;
     trainer.SaveCurrentChampionActivity(stream);
     blackBox->UpdateChildScheme("xor", stream);
+
+    cout << trainer.GetChampionEntity().ToString();
 
     for (int i = 0; i < 4; ++i)
     {
