@@ -88,6 +88,28 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void ChangeTrainingMode(TrainingMode newMode);
+
+	UFUNCTION(BlueprintCallable)
+	int GetCurrentEpoch() const;
+	UFUNCTION(BlueprintCallable)
+	bool IsComplexifying() const;
+	UFUNCTION(BlueprintCallable)
+	float GetBestFitness() const;
+	UFUNCTION(BlueprintCallable)
+	float GetChampionFitness() const;
+	UFUNCTION(BlueprintCallable)
+	float GetMeanFitness() const;
+	UFUNCTION(BlueprintCallable)
+	float GetMeanComplexity() const;
+	UFUNCTION(BlueprintCallable)
+	float GetMeanEvaluationDuration() const;
+
+	UFUNCTION(BlueprintCallable)
+	float GetEvaluationPerSec() const;
+	UFUNCTION(BlueprintCallable)
+	float GetTotalEvaluations() const;
+	UFUNCTION(BlueprintCallable)
+	float GetTotalEvaluationTime() const;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -99,7 +121,6 @@ public:
 private:
 	
 	TrainingMode _trainingMode;
-	int _epoch;
 	std::shared_ptr<flux::NeatActivityUnit> _neatActivity;
 	std::unique_ptr<flux::NeatActivityTrainer> _trainer;
 	std::shared_ptr<flux::SingleActivityBlackBox> _blackBox;

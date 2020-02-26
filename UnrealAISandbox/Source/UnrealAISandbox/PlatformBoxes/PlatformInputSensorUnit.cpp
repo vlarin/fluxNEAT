@@ -55,14 +55,6 @@ std::vector<NeuralInput> PlatformInputSensorUnit::Fetch() const
 	auto boxH = FMath::Clamp<float>(dir.X, -5, 5);
 	auto boxV = FMath::Clamp<float>(dir.Y, -5, 5);
 	
-	auto msg = FString::Format(TEXT("T: {5} C: {6} BoxH:{0} BoxV:{1} SpH:{2} SpV:{3} Dist:{4}"),
-		{
-			boxH,
-			boxV,
-			speed.X / 100.0, speed.Y / 100.0, dist, 0, 0// target.ToCompactString(), centroid.ToCompactString()
-		});
-	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, msg);
-	
 	return std::vector<NeuralInput> {
 		NeuralInput(BoxHId, boxH),
 		NeuralInput(BoxVId, boxV),

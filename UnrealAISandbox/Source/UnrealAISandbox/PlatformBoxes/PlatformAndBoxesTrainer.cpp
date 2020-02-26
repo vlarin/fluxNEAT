@@ -163,16 +163,13 @@ void APlatformAndBoxesTrainer::ChangeTrainingMode(TrainingMode newMode)
 			_blackBox,
 			registry);
 
-		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Turquoise, TEXT("Initializing complete. Enabling platform sandboxes:"));
 		UE_LOG(LogTemp, Log, TEXT("Initializing complete. Enabling platform sandboxes:"));
 
-		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Turquoise, TEXT("Enabled. Starting training..."));
 		UE_LOG(LogTemp, Log, TEXT("Enabled. Starting training..."));
-		_trainer->Step();
+		_trainer->Step(0.0001);
 	}
 	else if (newMode == TM_REVIEW)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Turquoise, TEXT("Enabled. Loading champion..."));
 		UE_LOG(LogTemp, Log, TEXT("Enabled. Loading champion..."));
 		auto data = LoadFromFile(TestingEpoch);
 		stringstream stream(std::string(reinterpret_cast<const char *>(data.GetData()), data.Num()));
@@ -180,7 +177,6 @@ void APlatformAndBoxesTrainer::ChangeTrainingMode(TrainingMode newMode)
 	}
 	else
 	{
-		_epoch = 0;
 		_trainer.reset();
 		for (auto &sandbox : CurrentEvaluatedSandboxes)
 		{
@@ -192,12 +188,111 @@ void APlatformAndBoxesTrainer::ChangeTrainingMode(TrainingMode newMode)
 	}
 }
 
+int APlatformAndBoxesTrainer::GetCurrentEpoch() const
+{
+	if (!_trainer)
+	{
+		return 0;
+	}
+	
+	return static_cast<int>(_trainer->GetCurrentEpoch());
+}
+
+bool APlatformAndBoxesTrainer::IsComplexifying() const
+{
+	if (!_trainer)
+	{
+		return false;
+	}
+	
+	return _trainer->IsComplexifying();
+}
+
+float APlatformAndBoxesTrainer::GetBestFitness() const
+{
+	if (!_trainer)
+	{
+		return 0;
+	}
+
+	return _trainer->GetBestFitness();
+}
+
+float APlatformAndBoxesTrainer::GetChampionFitness() const
+{
+	if (!_trainer)
+	{
+		return 0;
+	}
+
+	return _trainer->GetChampionFitness();
+}
+
+float APlatformAndBoxesTrainer::GetMeanFitness() const
+{
+	if (!_trainer)
+	{
+		return 0;
+	}
+
+	return _trainer->GetMeanFitness();
+}
+
+float APlatformAndBoxesTrainer::GetMeanComplexity() const
+{
+	if (!_trainer)
+	{
+		return 0;
+	}
+
+	return _trainer->GetMeanComplexity();
+}
+
+float APlatformAndBoxesTrainer::GetMeanEvaluationDuration() const
+{
+	if (!_trainer)
+	{
+		return 0;
+	}
+
+	return _trainer->GetMeanEvaluationDuration();
+}
+
+float APlatformAndBoxesTrainer::GetEvaluationPerSec() const
+{
+	if (!_trainer)
+	{
+		return 0;
+	}
+
+	return _trainer->GetEvaluationPerSec();
+}
+
+float APlatformAndBoxesTrainer::GetTotalEvaluations() const
+{
+	if (!_trainer)
+	{
+		return 0;
+	}
+
+	return _trainer->GetTotalEvaluations();
+}
+
+float APlatformAndBoxesTrainer::GetTotalEvaluationTime() const
+{
+	if (!_trainer)
+	{
+		return 0;
+	}
+
+	return _trainer->GetTotalEvaluationTime();
+}
+
 // Called when the game starts or when spawned
 void APlatformAndBoxesTrainer::BeginPlay()
 {
 	Super::BeginPlay();
 
-	_epoch = 0;
 	_trainingMode = TM_DISABLED;
 
 	UWorld* world = GetWorld();
@@ -212,7 +307,6 @@ void APlatformAndBoxesTrainer::BeginPlay()
 	}
 	else
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Failed to init..."));
 		UE_LOG(LogTemp, Error, TEXT("Failed to init..."));
 		return;
 	}
@@ -232,7 +326,6 @@ void APlatformAndBoxesTrainer::BeginPlay()
 
 	_blackBox->AddOutput(output);
 
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Turquoise, TEXT("Initialized platform sandbox..."));
 	UE_LOG(LogTemp, Log, TEXT("Initialized platform sandbox..."));
 }
 
@@ -276,31 +369,25 @@ void APlatformAndBoxesTrainer::Tick(float DeltaTime)
 	{
 		if (_trainer->IsEpochCompleted())
 		{
-			++_epoch;
-
-			auto msg = FString::Format(TEXT("Completed {0} epoch. Champion - {1}"), { _epoch, _trainer->GetChampionFitness() });
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Turquoise, msg);
-			UE_LOG(LogTemp, Log, TEXT("Completed %d epoch. Champion - %f"), _epoch, _trainer->GetChampionFitness());
+			UE_LOG(LogTemp, Log, TEXT("Completed %d epoch. Champion - %f"), (int)_trainer->GetCurrentEpoch(), _trainer->GetChampionFitness());
 			
 			std::stringstream stream(std::ios::in | std::ios::out | std::ios::binary);
 			_trainer->SaveCurrentChampionActivity(stream);
 
 			auto data = stream.str();
-			SaveToFile(_epoch, data.c_str(), data.length());
+			SaveToFile(static_cast<int>(_trainer->GetCurrentEpoch()), data.c_str(), data.length());
 			
-			_trainer->Step();
+			_trainer->Step(DeltaTime);
 			return;
 		}
 		
 		if (_trainer->GetChampionFitness() < TargetFitness)
 		{
-			_trainer->Step();
+			_trainer->Step(DeltaTime);
 		}
 		else
 		{
-			auto msg = FString::Format(TEXT("Training completed by {0} epochs."), { _epoch });
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Turquoise, msg);
-			UE_LOG(LogTemp, Log, TEXT("Training completed by %d epochs."), _epoch);
+			UE_LOG(LogTemp, Log, TEXT("Training completed by %d epochs."), (int)_trainer->GetCurrentEpoch());
 
 			std::stringstream stream;
 			_trainer->SaveCurrentChampionActivity(stream);
