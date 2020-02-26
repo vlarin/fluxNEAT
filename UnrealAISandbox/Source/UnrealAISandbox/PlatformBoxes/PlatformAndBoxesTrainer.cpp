@@ -82,7 +82,7 @@ public:
 			spawnParameters.Owner = _trainer;
 			sandbox = world->SpawnActor<APlatformAndBoxesSandbox>(_trainer->SandboxPrefab, FVector(x, y, z), FRotator::ZeroRotator, spawnParameters);
 			//sandbox->AttachToActor(_trainer, FAttachmentTransformRules::KeepRelativeTransform);
-			sandbox->MovementAcceleration = _trainer->MovementAcceleration;
+			sandbox->MovementAcceleration = 10;
 
 			_trainer->CurrentEvaluatedSandboxes.Add(sandbox);
 		}
@@ -303,7 +303,7 @@ void APlatformAndBoxesTrainer::BeginPlay()
 		_sandbox = world->SpawnActor<APlatformAndBoxesSandbox>(SandboxPrefab, FVector(-1000, -1000, 50), FRotator::ZeroRotator, spawnParameters);
 		_sandbox->AttachToActor(this, FAttachmentTransformRules::KeepRelativeTransform);
 		_sandbox->IsTesting = true;
-		_sandbox->MovementAcceleration = MovementAcceleration;
+		_sandbox->MovementAcceleration = 10;
 	}
 	else
 	{

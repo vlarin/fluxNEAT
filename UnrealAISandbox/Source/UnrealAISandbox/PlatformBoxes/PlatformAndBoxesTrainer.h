@@ -44,15 +44,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Trainer Config")
 	float SpeciesAmount = 2;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI Trainer Config")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Trainer Config")
 	float SpawnGridSize = 1000;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Trainer Config")
 	float ParallelEvaluationsAmount = 1;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Runtime Config")
-	float MovementAcceleration = 10;
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "NEAT Evolution Parameters")
 	float weightMutationProb = 0.8;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "NEAT Evolution Parameters")
