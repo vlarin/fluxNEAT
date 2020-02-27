@@ -194,12 +194,12 @@ void flux::NeatActivityTrainer::NeatActivityTrainerImpl::EmplaceForEvaluation(Ev
 
 flux::float_fl flux::NeatActivityTrainer::NeatActivityTrainerImpl::GetBestFitness() const
 {
-    return _bestChampion.Fitness();
+    return _bestChampion.Fitness() < 0 ? 0 : _bestChampion.Fitness();
 }
 
 flux::float_fl flux::NeatActivityTrainer::NeatActivityTrainerImpl::GetChampionFitness() const
 {
-    return _currentChampion.Fitness();
+    return _currentChampion.Fitness() < 0 ? 0 : _currentChampion.Fitness();
 }
 
 flux::NeatEntityDescriptor flux::NeatActivityTrainer::NeatActivityTrainerImpl::GetChampionEntity() const

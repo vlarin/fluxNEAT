@@ -203,6 +203,53 @@ void APlatformAndBoxesTrainer::ChangeTrainingMode(TrainingMode newMode)
 	}
 }
 
+void APlatformAndBoxesTrainer::SelectNeuralMap(int Index)
+{
+	const auto Entities = _trainer->GetCurrentEntities();
+	if (Index < 0 || Index >= Entities.size())
+	{
+		UE_LOG(LogActor, Error, TEXT("Unable to select neural map! Index error!"));
+		return;
+	}
+
+	const auto Target = Entities[Index];
+	const float MaxSize = Target.NeuronCount - 4;
+	FNeuralMap Map;
+	TArray<FVector2D> NeuronPositions;
+	NeuronPositions.Init(FVector2D::ZeroVector, Target.NeuronCount);
+	for (int i = 0; i < Target.NeuronCount; i++)
+	{
+		if (Target.Neurons[i].Type == NeatEntityDescriptor::INPUT || Target.Neurons[i].Type == NeatEntityDescriptor::BIAS)
+		{
+			NeuronPositions[i] = FVector2D(Target.Neurons[i].NormalizedPosition, (Map.InputNodes.Num()) / MaxSize);
+			Map.InputNodes.Add(NeuronPositions[i]);
+		}
+		else if (Target.Neurons[i].Type == NeatEntityDescriptor::HIDDEN)
+		{
+			NeuronPositions[i] = FVector2D(Target.Neurons[i].NormalizedPosition, (Map.HiddenNodes.Num()) / MaxSize);
+			Map.HiddenNodes.Add(NeuronPositions[i]);
+		}
+		else
+		{
+			NeuronPositions[i] = FVector2D(Target.Neurons[i].NormalizedPosition, (Map.OutputNodes.Num()) / MaxSize);
+			Map.OutputNodes.Add(NeuronPositions[i]);
+		}
+	}
+
+	for (int i = 0; i < Target.ConnectionsCount; i++)
+	{
+		FNeuralConnection Connection;
+		Connection.From = NeuronPositions[Target.NeuronConnections[i].OriginId];
+		Connection.To = NeuronPositions[Target.NeuronConnections[i].DestinationId];
+		Connection.Weight = FMath::Abs(Target.NeuronConnections[i].Weight);
+		Connection.IsPositive = Target.NeuronConnections[i].Weight > 0;
+		
+		Map.Connections.Add(Connection);
+	}
+
+	CurrentNeuralMap = Map;
+}
+
 int APlatformAndBoxesTrainer::GetCurrentEpoch() const
 {
 	if (!_trainer)

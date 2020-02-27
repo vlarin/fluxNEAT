@@ -90,9 +90,15 @@ public:
 
 	UPROPERTY(BlueprintReadOnly)
 	TArray<float> CurrentSpeciesDistribution;
+
+	UPROPERTY(BlueprintReadOnly)
+	FNeuralMap CurrentNeuralMap;
 	
 	UFUNCTION(BlueprintCallable)
 	void ChangeTrainingMode(TrainingMode newMode);
+
+	UFUNCTION(BlueprintCallable)
+	void SelectNeuralMap(int Index);
 
 	UFUNCTION(BlueprintCallable)
 	int GetCurrentEpoch() const;
