@@ -309,6 +309,7 @@ void APlatformAndBoxesTrainer::BeginPlay()
 	Super::BeginPlay();
 
 	_trainingMode = TM_DISABLED;
+	CurrentSpeciesDistribution.Init(0, 10);
 
 	UWorld* world = GetWorld();
 	if (world && SandboxPrefab)
@@ -382,7 +383,7 @@ void APlatformAndBoxesTrainer::Tick(float DeltaTime)
 	}
 	
 	if (_trainingMode == TM_TRAINING)
-	{
+	{		
 		if (_trainer->IsEpochCompleted())
 		{
 			UE_LOG(LogTemp, Log, TEXT("Completed %d epoch. Champion - %f"), (int)_trainer->GetCurrentEpoch(), _trainer->GetChampionFitness());
@@ -391,6 +392,20 @@ void APlatformAndBoxesTrainer::Tick(float DeltaTime)
 			_trainer->SaveCurrentChampionActivity(stream);
 			ConvertDescriptorsToUEntries(_currentEntities, *_trainer);
 			EntitiesList->SetListItems(_currentEntities);
+
+			CurrentSpeciesDistribution.Init(0, 10);
+			auto entities = _trainer->GetCurrentEntities();
+			for (const auto &e : entities)
+			{
+				CurrentSpeciesDistribution[e.SpecieId]++;
+			}
+			
+			float aggregated = 0;
+			for (int i = 0; i < SpeciesAmount && i < 10; i++)
+			{
+				CurrentSpeciesDistribution[i] = (CurrentSpeciesDistribution[i]) + aggregated;
+				aggregated = CurrentSpeciesDistribution[i];
+			}
 
 			auto data = stream.str();
 			SaveToFile(static_cast<int>(_trainer->GetCurrentEpoch()), data.c_str(), data.length());

@@ -88,6 +88,9 @@ public:
 	UPROPERTY()
 	TArray<APlatformAndBoxesSandbox*> CurrentEvaluatedSandboxes;
 
+	UPROPERTY(BlueprintReadOnly)
+	TArray<float> CurrentSpeciesDistribution;
+	
 	UFUNCTION(BlueprintCallable)
 	void ChangeTrainingMode(TrainingMode newMode);
 
