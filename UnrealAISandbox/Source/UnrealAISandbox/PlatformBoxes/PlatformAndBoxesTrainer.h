@@ -8,6 +8,8 @@
 
 #include <flux/common.h>
 #include <flux/training.h>
+#include "Common/NeatEntityEntry.h"
+#include "ListView.h"
 
 #include "PlatformAndBoxesTrainer.generated.h"
 
@@ -28,6 +30,9 @@ public:
 	
 	// Sets default values for this actor's properties
 	APlatformAndBoxesTrainer();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Trainer Bindings")
+	UListView *EntitiesList;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Trainer Config")
 	FString TestingEpoch  = "";
@@ -124,5 +129,8 @@ private:
 	
 	UPROPERTY()
 	APlatformAndBoxesSandbox *_sandbox;
+
+	UPROPERTY()
+	TArray<UNeatEntityEntry*> _currentEntities;
 
 };

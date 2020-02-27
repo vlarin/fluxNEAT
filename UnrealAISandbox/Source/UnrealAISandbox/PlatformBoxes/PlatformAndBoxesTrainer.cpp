@@ -148,6 +148,21 @@ static TArray<uint8> LoadFromFile(FString name)
 	return res;
 }
 
+static void ConvertDescriptorsToUEntries(TArray<UNeatEntityEntry*> &Array, const flux::NeatActivityTrainer &Trainer)
+{
+	std::vector<NeatEntityDescriptor> Entities = Trainer.GetCurrentEntities();
+	Array.Init(nullptr, Entities.size());
+	for (int i = 0; i < Entities.size(); i++)
+	{
+		UNeatEntityEntry *Entry = NewObject<UNeatEntityEntry>();
+		Entry->Id = Entities[i].Id;
+		Entry->SpeciesId = Entities[i].SpecieId;
+		Entry->Complexity = Entities[i].Complexity;
+		Entry->Fitness = Entities[i].Fitness;
+		Array[i] = Entry;
+	}
+}
+
 void APlatformAndBoxesTrainer::ChangeTrainingMode(TrainingMode newMode)
 {
 	_trainingMode = newMode;
@@ -354,6 +369,7 @@ static void SaveToFile(int epoch, const char *data, int32 size)
 		}
 	}
 }
+
 // Called every frame
 void APlatformAndBoxesTrainer::Tick(float DeltaTime)
 {
@@ -373,6 +389,8 @@ void APlatformAndBoxesTrainer::Tick(float DeltaTime)
 			
 			std::stringstream stream(std::ios::in | std::ios::out | std::ios::binary);
 			_trainer->SaveCurrentChampionActivity(stream);
+			ConvertDescriptorsToUEntries(_currentEntities, *_trainer);
+			EntitiesList->SetListItems(_currentEntities);
 
 			auto data = stream.str();
 			SaveToFile(static_cast<int>(_trainer->GetCurrentEpoch()), data.c_str(), data.length());
@@ -399,4 +417,3 @@ void APlatformAndBoxesTrainer::Tick(float DeltaTime)
 	}
 
 }
-
