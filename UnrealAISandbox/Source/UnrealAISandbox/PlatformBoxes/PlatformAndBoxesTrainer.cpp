@@ -119,10 +119,10 @@ APlatformAndBoxesTrainer::APlatformAndBoxesTrainer()
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 }
 
-static TArray<uint8> LoadFromFile(FString name)
+static TArray<uint8> LoadFromFile(FString workingDir, FString name)
 {
 	TArray<uint8> res;
-	FString SaveDirectory = FString("E:/");
+	FString SaveDirectory = workingDir;
 	FString FileName = name;
 
 	IPlatformFile& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
@@ -165,7 +165,6 @@ static void ConvertDescriptorsToUEntries(TArray<UNeatEntityEntry*> &Array, const
 
 void APlatformAndBoxesTrainer::ChangeTrainingMode(TrainingMode newMode)
 {
-	_trainingMode = newMode;
 	if (newMode == TM_TRAINING)
 	{
 		auto contextTemplate = std::make_shared<PlatformBoxesContext>(_sandbox, 0);
@@ -178,6 +177,7 @@ void APlatformAndBoxesTrainer::ChangeTrainingMode(TrainingMode newMode)
 			_blackBox,
 			registry);
 
+		_trainingMode = newMode;
 		UE_LOG(LogTemp, Log, TEXT("Initializing complete. Enabling platform sandboxes:"));
 
 		UE_LOG(LogTemp, Log, TEXT("Enabled. Starting training..."));
@@ -186,12 +186,21 @@ void APlatformAndBoxesTrainer::ChangeTrainingMode(TrainingMode newMode)
 	else if (newMode == TM_REVIEW)
 	{
 		UE_LOG(LogTemp, Log, TEXT("Enabled. Loading champion..."));
-		auto data = LoadFromFile(TestingEpoch);
-		stringstream stream(std::string(reinterpret_cast<const char *>(data.GetData()), data.Num()));
-		_neatActivity->UpdateScheme(stream);
+		auto data = LoadFromFile(WorkingDirPath, TestingEpoch);
+		if (data.Num() > 0)
+		{
+			stringstream stream(std::string(reinterpret_cast<const char *>(data.GetData()), data.Num()));
+			_neatActivity->UpdateScheme(stream);
+			_trainingMode = newMode;
+		}
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, TEXT("Unable to load chamption!"));
+		}
 	}
 	else
 	{
+		_trainingMode = newMode;
 		_trainer.reset();
 		for (auto &sandbox : CurrentEvaluatedSandboxes)
 		{
@@ -213,7 +222,7 @@ void APlatformAndBoxesTrainer::SelectNeuralMap(int Index)
 	}
 
 	const auto Target = Entities[Index];
-	const float MaxSize = Target.NeuronCount - 4;
+	const float MaxSize = 6;
 	FNeuralMap Map;
 	TArray<FVector2D> NeuronPositions;
 	NeuronPositions.Init(FVector2D::ZeroVector, Target.NeuronCount);
@@ -242,6 +251,16 @@ void APlatformAndBoxesTrainer::SelectNeuralMap(int Index)
 		Connection.From = NeuronPositions[Target.NeuronConnections[i].OriginId];
 		Connection.To = NeuronPositions[Target.NeuronConnections[i].DestinationId];
 		Connection.Weight = FMath::Abs(Target.NeuronConnections[i].Weight);
+		if (Connection.Weight < 0.6)
+		{
+			continue;
+		}
+		
+		if (Connection.Weight > 1)
+		{
+			Connection.Weight = FMath::Sqrt(Connection.Weight);
+		} 
+		
 		Connection.IsPositive = Target.NeuronConnections[i].Weight > 0;
 		
 		Map.Connections.Add(Connection);
@@ -392,9 +411,9 @@ void APlatformAndBoxesTrainer::BeginPlay()
 	UE_LOG(LogTemp, Log, TEXT("Initialized platform sandbox..."));
 }
 
-static void SaveToFile(int epoch, const char *data, int32 size)
+static void SaveToFile(int epoch, const char *data, int32 size, FString workingDir)
 {
-	FString SaveDirectory = FString("E:/");
+	FString SaveDirectory = workingDir;
 	FString FileName = FString::Printf(TEXT("champion_%d.txt"), epoch);
 	bool AllowOverwriting = true;
 
@@ -455,7 +474,7 @@ void APlatformAndBoxesTrainer::Tick(float DeltaTime)
 			}
 
 			auto data = stream.str();
-			SaveToFile(static_cast<int>(_trainer->GetCurrentEpoch()), data.c_str(), data.length());
+			SaveToFile(static_cast<int>(_trainer->GetCurrentEpoch()), data.c_str(), data.length(), WorkingDirPath);
 			
 			_trainer->Step(DeltaTime);
 			return;

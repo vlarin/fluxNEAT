@@ -54,6 +54,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Trainer Config")
 	float ParallelEvaluationsAmount = 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Trainer Config")
+	FString WorkingDirPath;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "NEAT Evolution Parameters")
 	float weightMutationProb = 0.8;
