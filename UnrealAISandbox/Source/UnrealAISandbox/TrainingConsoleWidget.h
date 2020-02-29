@@ -33,9 +33,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI Config")
 	TSubclassOf<APlatformAndBoxesTrainer> TrainerPrefab;
 	
-	//Fire a Weapon
+	//Train XOR network
 	UFUNCTION(BlueprintCallable, Category = "Handlers")
-	void OnTrainingClick();
+	void OnTrainingClick();	
 
 private:
 	bool _isTraining;

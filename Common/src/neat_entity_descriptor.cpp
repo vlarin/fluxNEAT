@@ -43,7 +43,8 @@ flux::NeatEntityDescriptor::NeatEntityDescriptor(const flux::NeatEntityDescripto
 	if (NeuronCount > 0)
 	{
 		Neurons = new NeatEntityDescriptor::Neuron[NeuronCount];
-		memcpy_s(Neurons, sizeof(Neuron) * NeuronCount, other.Neurons, sizeof(Neuron) * NeuronCount);
+
+		memcpy(Neurons, other.Neurons, sizeof(Neuron) * NeuronCount);
 	}
 	else
 	{
@@ -53,7 +54,7 @@ flux::NeatEntityDescriptor::NeatEntityDescriptor(const flux::NeatEntityDescripto
 	if (ConnectionsCount > 0)
 	{
 		NeuronConnections = new NeatEntityDescriptor::NeuronConnection[ConnectionsCount];
-		memcpy_s(NeuronConnections, sizeof(NeuronConnection) * ConnectionsCount, other.NeuronConnections, sizeof(NeuronConnection) * ConnectionsCount);
+		memcpy(NeuronConnections, other.NeuronConnections, sizeof(NeuronConnection) * ConnectionsCount);
 	}
 	else
 	{
@@ -81,7 +82,7 @@ flux::NeatEntityDescriptor &flux::NeatEntityDescriptor::operator=(const flux::Ne
 	if (NeuronCount > 0)
 	{
 		Neurons = new NeatEntityDescriptor::Neuron[NeuronCount];
-		memcpy_s(Neurons, sizeof(Neuron) * NeuronCount, other.Neurons, sizeof(Neuron) * NeuronCount);
+		memcpy(Neurons, other.Neurons, sizeof(Neuron) * NeuronCount);
 	}
 	else
 	{
@@ -91,7 +92,7 @@ flux::NeatEntityDescriptor &flux::NeatEntityDescriptor::operator=(const flux::Ne
 	if (ConnectionsCount > 0)
 	{
 		NeuronConnections = new NeatEntityDescriptor::NeuronConnection[ConnectionsCount];
-		memcpy_s(NeuronConnections, sizeof(NeuronConnection) * ConnectionsCount, other.NeuronConnections, sizeof(NeuronConnection) * ConnectionsCount);
+		memcpy(NeuronConnections, other.NeuronConnections, sizeof(NeuronConnection) * ConnectionsCount);
 	}
 	else
 	{

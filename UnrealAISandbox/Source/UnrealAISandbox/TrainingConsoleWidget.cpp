@@ -117,23 +117,19 @@ void UTrainingConsoleWidget::NativeTick(const FGeometry& MyGeometry, float InDel
 		{
 			for (int i = 0; i < 100; i++)
 			{
-				_trainer->Step();
+				_trainer->Step(InDeltaTime);
 
 				if (_trainer->IsEpochCompleted())
 				{
 					++_epoch;
 
-					auto msg = FString::Format(TEXT("Completed {0} epoch."),{ _epoch });
-					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Turquoise, msg);
 					UE_LOG(LogTemp, Log, TEXT("Completed %d epoch."), _epoch);
-					_trainer->Step();
+					_trainer->Step(0.001);
 				}
 			}
 		}
 		else
 		{
-			auto msg = FString::Format(TEXT("Training completed by {0} epochs."), { _epoch });
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Turquoise, msg);
 			UE_LOG(LogTemp, Log, TEXT("Training completed by %d epochs."), _epoch);
 
 			std::stringstream stream;
@@ -144,13 +140,6 @@ void UTrainingConsoleWidget::NativeTick(const FGeometry& MyGeometry, float InDel
 			{
 				_blackBox->Step();
 
-				msg = FString::Format(TEXT("A: {0} B: {1} O: {2}"), 
-					{
-						_blackBox->GetInputOf("a").GetValue(),
-						_blackBox->GetInputOf("b").GetValue(),
-						_blackBox->GetOutputOf("xor_value").GetValue()
-					});
-				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Turquoise, msg);
 				UE_LOG(LogTemp, Log, TEXT("A: %f B: %f O: %f"),
 					_blackBox->GetInputOf("a").GetValue(),
 					_blackBox->GetInputOf("b").GetValue(),
@@ -174,7 +163,6 @@ void UTrainingConsoleWidget::TrainXOR()
 	_epoch = 0;
 	_isTraining = false;
 	
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Turquoise, TEXT("Starting black box test..."));
 	UE_LOG(LogTemp, Log, TEXT("Starting black box test..."));
 	auto context = std::make_shared<UnitContext>("Empty Context");
 	_blackBox = std::make_shared<SingleActivityBlackBox>("test", context);
@@ -210,11 +198,9 @@ void UTrainingConsoleWidget::TrainXOR()
 		_blackBox,
 		registry);
 
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Turquoise, TEXT("Initializing complete. Enabling black box:"));
 	UE_LOG(LogTemp, Log, TEXT("Initializing complete. Enabling black box:"));
 	_isTraining = true;
 
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Turquoise, TEXT("Enabling. Starting training..."));
 	UE_LOG(LogTemp, Log, TEXT("Enabling. Starting training..."));
-	_trainer->Step();	
+	_trainer->Step(0.001);	
 }

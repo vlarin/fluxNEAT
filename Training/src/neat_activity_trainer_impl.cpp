@@ -312,3 +312,13 @@ flux::NeatEntityDescriptor flux::NeatActivityTrainer::NeatActivityTrainerImpl::C
 
     return { id, specieId, genome.Complexity(), genome.Fitness(), genome.NodeCount(), genome.Complexity(), neurons, connections };
 }
+
+void flux::NeatActivityTrainer::NeatActivityTrainerImpl::DumpState(std::ostream &stream)
+{
+    boost::archive::text_oarchive ar(stream);
+    auto genomes = _training.Genomes();
+    for (const auto& genome : genomes)
+    {
+        ar << genome;
+    }
+}

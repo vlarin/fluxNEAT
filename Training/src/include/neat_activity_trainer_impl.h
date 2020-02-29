@@ -56,6 +56,8 @@ namespace flux {
 
         void Step(float_fl delta);
 
+        void DumpState(std::ostream &stream);
+
         NeatEntityDescriptor GetChampionEntity() const;
         std::vector<NeatEntityDescriptor> GetCurrentEntities() const;
 

@@ -82,7 +82,7 @@ public:
 			spawnParameters.Owner = _trainer;
 			sandbox = world->SpawnActor<APlatformAndBoxesSandbox>(_trainer->SandboxPrefab, FVector(x, y, z), FRotator::ZeroRotator, spawnParameters);
 			//sandbox->AttachToActor(_trainer, FAttachmentTransformRules::KeepRelativeTransform);
-			sandbox->MovementAcceleration = _trainer->MovementAcceleration;
+			sandbox->MovementAcceleration = 10;
 
 			_trainer->CurrentEvaluatedSandboxes.Add(sandbox);
 		}
@@ -119,10 +119,10 @@ APlatformAndBoxesTrainer::APlatformAndBoxesTrainer()
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 }
 
-static TArray<uint8> LoadFromFile(FString name)
+static TArray<uint8> LoadFromFile(FString workingDir, FString name)
 {
 	TArray<uint8> res;
-	FString SaveDirectory = FString("E:/");
+	FString SaveDirectory = workingDir;
 	FString FileName = name;
 
 	IPlatformFile& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
@@ -148,9 +148,23 @@ static TArray<uint8> LoadFromFile(FString name)
 	return res;
 }
 
+static void ConvertDescriptorsToUEntries(TArray<UNeatEntityEntry*> &Array, const flux::NeatActivityTrainer &Trainer)
+{
+	std::vector<NeatEntityDescriptor> Entities = Trainer.GetCurrentEntities();
+	Array.Init(nullptr, Entities.size());
+	for (int i = 0; i < Entities.size(); i++)
+	{
+		UNeatEntityEntry *Entry = NewObject<UNeatEntityEntry>();
+		Entry->Id = Entities[i].Id;
+		Entry->SpeciesId = Entities[i].SpecieId;
+		Entry->Complexity = Entities[i].Complexity;
+		Entry->Fitness = Entities[i].Fitness;
+		Array[i] = Entry;
+	}
+}
+
 void APlatformAndBoxesTrainer::ChangeTrainingMode(TrainingMode newMode)
 {
-	_trainingMode = newMode;
 	if (newMode == TM_TRAINING)
 	{
 		auto contextTemplate = std::make_shared<PlatformBoxesContext>(_sandbox, 0);
@@ -163,24 +177,30 @@ void APlatformAndBoxesTrainer::ChangeTrainingMode(TrainingMode newMode)
 			_blackBox,
 			registry);
 
-		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Turquoise, TEXT("Initializing complete. Enabling platform sandboxes:"));
+		_trainingMode = newMode;
 		UE_LOG(LogTemp, Log, TEXT("Initializing complete. Enabling platform sandboxes:"));
-
-		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Turquoise, TEXT("Enabled. Starting training..."));
-		UE_LOG(LogTemp, Log, TEXT("Enabled. Starting training..."));
-		_trainer->Step();
+        
+		_trainer->Step(0.0001);
+        UE_LOG(LogTemp, Log, TEXT("Enabled. Starting training..."));
 	}
 	else if (newMode == TM_REVIEW)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Turquoise, TEXT("Enabled. Loading champion..."));
 		UE_LOG(LogTemp, Log, TEXT("Enabled. Loading champion..."));
-		auto data = LoadFromFile(TestingEpoch);
-		stringstream stream(std::string(reinterpret_cast<const char *>(data.GetData()), data.Num()));
-		_neatActivity->UpdateScheme(stream);
+		auto data = LoadFromFile(WorkingDirPath, TestingEpoch);
+		if (data.Num() > 0)
+		{
+			stringstream stream(std::string(reinterpret_cast<const char *>(data.GetData()), data.Num()));
+			_neatActivity->UpdateScheme(stream);
+			_trainingMode = newMode;
+		}
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, TEXT("Unable to load chamption!"));
+		}
 	}
 	else
 	{
-		_epoch = 0;
+		_trainingMode = newMode;
 		_trainer.reset();
 		for (auto &sandbox : CurrentEvaluatedSandboxes)
 		{
@@ -192,13 +212,170 @@ void APlatformAndBoxesTrainer::ChangeTrainingMode(TrainingMode newMode)
 	}
 }
 
+void APlatformAndBoxesTrainer::SelectNeuralMap(int Index)
+{
+	const auto Entities = _trainer->GetCurrentEntities();
+	if (Index < 0 || Index >= Entities.size())
+	{
+		UE_LOG(LogActor, Error, TEXT("Unable to select neural map! Index error!"));
+		return;
+	}
+
+	const auto Target = Entities[Index];
+	const float MaxSize = 6;
+	FNeuralMap Map;
+	TArray<FVector2D> NeuronPositions;
+	NeuronPositions.Init(FVector2D::ZeroVector, Target.NeuronCount);
+	for (int i = 0; i < Target.NeuronCount; i++)
+	{
+		if (Target.Neurons[i].Type == NeatEntityDescriptor::INPUT || Target.Neurons[i].Type == NeatEntityDescriptor::BIAS)
+		{
+			NeuronPositions[i] = FVector2D(Target.Neurons[i].NormalizedPosition, (Map.InputNodes.Num()) / MaxSize);
+			Map.InputNodes.Add(NeuronPositions[i]);
+		}
+		else if (Target.Neurons[i].Type == NeatEntityDescriptor::HIDDEN)
+		{
+			NeuronPositions[i] = FVector2D(Target.Neurons[i].NormalizedPosition, (Map.HiddenNodes.Num()) / MaxSize);
+			Map.HiddenNodes.Add(NeuronPositions[i]);
+		}
+		else
+		{
+			NeuronPositions[i] = FVector2D(Target.Neurons[i].NormalizedPosition, (Map.OutputNodes.Num()) / MaxSize);
+			Map.OutputNodes.Add(NeuronPositions[i]);
+		}
+	}
+
+	for (int i = 0; i < Target.ConnectionsCount; i++)
+	{
+		FNeuralConnection Connection;
+		Connection.From = NeuronPositions[Target.NeuronConnections[i].OriginId];
+		Connection.To = NeuronPositions[Target.NeuronConnections[i].DestinationId];
+		Connection.Weight = FMath::Abs(Target.NeuronConnections[i].Weight);
+		if (Connection.Weight < 0.6)
+		{
+			continue;
+		}
+		
+		if (Connection.Weight > 1)
+		{
+			Connection.Weight = FMath::Sqrt(Connection.Weight);
+		} 
+		
+		Connection.IsPositive = Target.NeuronConnections[i].Weight > 0;
+		
+		Map.Connections.Add(Connection);
+	}
+
+	CurrentNeuralMap = Map;
+}
+
+int APlatformAndBoxesTrainer::GetCurrentEpoch() const
+{
+	if (!_trainer)
+	{
+		return 0;
+	}
+	
+	return static_cast<int>(_trainer->GetCurrentEpoch());
+}
+
+bool APlatformAndBoxesTrainer::IsComplexifying() const
+{
+	if (!_trainer)
+	{
+		return false;
+	}
+	
+	return _trainer->IsComplexifying();
+}
+
+float APlatformAndBoxesTrainer::GetBestFitness() const
+{
+	if (!_trainer)
+	{
+		return 0;
+	}
+
+	return _trainer->GetBestFitness();
+}
+
+float APlatformAndBoxesTrainer::GetChampionFitness() const
+{
+	if (!_trainer)
+	{
+		return 0;
+	}
+
+	return _trainer->GetChampionFitness();
+}
+
+float APlatformAndBoxesTrainer::GetMeanFitness() const
+{
+	if (!_trainer)
+	{
+		return 0;
+	}
+
+	return _trainer->GetMeanFitness();
+}
+
+float APlatformAndBoxesTrainer::GetMeanComplexity() const
+{
+	if (!_trainer)
+	{
+		return 0;
+	}
+
+	return _trainer->GetMeanComplexity();
+}
+
+float APlatformAndBoxesTrainer::GetMeanEvaluationDuration() const
+{
+	if (!_trainer)
+	{
+		return 0;
+	}
+
+	return _trainer->GetMeanEvaluationDuration();
+}
+
+float APlatformAndBoxesTrainer::GetEvaluationPerSec() const
+{
+	if (!_trainer)
+	{
+		return 0;
+	}
+
+	return _trainer->GetEvaluationPerSec();
+}
+
+float APlatformAndBoxesTrainer::GetTotalEvaluations() const
+{
+	if (!_trainer)
+	{
+		return 0;
+	}
+
+	return _trainer->GetTotalEvaluations();
+}
+
+float APlatformAndBoxesTrainer::GetTotalEvaluationTime() const
+{
+	if (!_trainer)
+	{
+		return 0;
+	}
+
+	return _trainer->GetTotalEvaluationTime();
+}
+
 // Called when the game starts or when spawned
 void APlatformAndBoxesTrainer::BeginPlay()
 {
 	Super::BeginPlay();
 
-	_epoch = 0;
 	_trainingMode = TM_DISABLED;
+	CurrentSpeciesDistribution.Init(0, 10);
 
 	UWorld* world = GetWorld();
 	if (world && SandboxPrefab)
@@ -208,11 +385,10 @@ void APlatformAndBoxesTrainer::BeginPlay()
 		_sandbox = world->SpawnActor<APlatformAndBoxesSandbox>(SandboxPrefab, FVector(-1000, -1000, 50), FRotator::ZeroRotator, spawnParameters);
 		_sandbox->AttachToActor(this, FAttachmentTransformRules::KeepRelativeTransform);
 		_sandbox->IsTesting = true;
-		_sandbox->MovementAcceleration = MovementAcceleration;
+		_sandbox->MovementAcceleration = 10;
 	}
 	else
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Failed to init..."));
 		UE_LOG(LogTemp, Error, TEXT("Failed to init..."));
 		return;
 	}
@@ -232,13 +408,12 @@ void APlatformAndBoxesTrainer::BeginPlay()
 
 	_blackBox->AddOutput(output);
 
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Turquoise, TEXT("Initialized platform sandbox..."));
 	UE_LOG(LogTemp, Log, TEXT("Initialized platform sandbox..."));
 }
 
-static void SaveToFile(int epoch, const char *data, int32 size)
+static void SaveToFile(int epoch, const char *data, int32 size, FString workingDir)
 {
-	FString SaveDirectory = FString("E:/");
+	FString SaveDirectory = workingDir;
 	FString FileName = FString::Printf(TEXT("champion_%d.txt"), epoch);
 	bool AllowOverwriting = true;
 
@@ -261,6 +436,7 @@ static void SaveToFile(int epoch, const char *data, int32 size)
 		}
 	}
 }
+
 // Called every frame
 void APlatformAndBoxesTrainer::Tick(float DeltaTime)
 {
@@ -273,34 +449,44 @@ void APlatformAndBoxesTrainer::Tick(float DeltaTime)
 	}
 	
 	if (_trainingMode == TM_TRAINING)
-	{
+	{		
 		if (_trainer->IsEpochCompleted())
 		{
-			++_epoch;
-
-			auto msg = FString::Format(TEXT("Completed {0} epoch. Champion - {1}"), { _epoch, _trainer->GetChampionFitness() });
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Turquoise, msg);
-			UE_LOG(LogTemp, Log, TEXT("Completed %d epoch. Champion - %f"), _epoch, _trainer->GetChampionFitness());
+			UE_LOG(LogTemp, Log, TEXT("Completed %d epoch. Champion - %f"), (int)_trainer->GetCurrentEpoch(), _trainer->GetChampionFitness());
 			
 			std::stringstream stream(std::ios::in | std::ios::out | std::ios::binary);
 			_trainer->SaveCurrentChampionActivity(stream);
+			ConvertDescriptorsToUEntries(_currentEntities, *_trainer);
+			EntitiesList->SetListItems(_currentEntities);
+
+			CurrentSpeciesDistribution.Init(0, 10);
+			auto entities = _trainer->GetCurrentEntities();
+			for (const auto &e : entities)
+			{
+				CurrentSpeciesDistribution[e.SpecieId]++;
+			}
+			
+			float aggregated = 0;
+			for (int i = 0; i < SpeciesAmount && i < 10; i++)
+			{
+				CurrentSpeciesDistribution[i] = (CurrentSpeciesDistribution[i]) + aggregated;
+				aggregated = CurrentSpeciesDistribution[i];
+			}
 
 			auto data = stream.str();
-			SaveToFile(_epoch, data.c_str(), data.length());
+			SaveToFile(static_cast<int>(_trainer->GetCurrentEpoch()), data.c_str(), data.length(), WorkingDirPath);
 			
-			_trainer->Step();
+			_trainer->Step(DeltaTime);
 			return;
 		}
 		
 		if (_trainer->GetChampionFitness() < TargetFitness)
 		{
-			_trainer->Step();
+			_trainer->Step(DeltaTime);
 		}
 		else
 		{
-			auto msg = FString::Format(TEXT("Training completed by {0} epochs."), { _epoch });
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Turquoise, msg);
-			UE_LOG(LogTemp, Log, TEXT("Training completed by %d epochs."), _epoch);
+			UE_LOG(LogTemp, Log, TEXT("Training completed by %d epochs."), (int)_trainer->GetCurrentEpoch());
 
 			std::stringstream stream;
 			_trainer->SaveCurrentChampionActivity(stream);
@@ -312,4 +498,3 @@ void APlatformAndBoxesTrainer::Tick(float DeltaTime)
 	}
 
 }
-

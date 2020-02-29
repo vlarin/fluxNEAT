@@ -8,6 +8,8 @@
 
 #include <flux/common.h>
 #include <flux/training.h>
+#include "Common/NeatEntityEntry.h"
+#include "ListView.h"
 
 #include "PlatformAndBoxesTrainer.generated.h"
 
@@ -28,6 +30,9 @@ public:
 	
 	// Sets default values for this actor's properties
 	APlatformAndBoxesTrainer();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Trainer Bindings")
+	UListView *EntitiesList;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Trainer Config")
 	FString TestingEpoch  = "";
@@ -44,15 +49,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Trainer Config")
 	float SpeciesAmount = 2;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI Trainer Config")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Trainer Config")
 	float SpawnGridSize = 1000;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Trainer Config")
 	float ParallelEvaluationsAmount = 1;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Runtime Config")
-	float MovementAcceleration = 10;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Trainer Config")
+	FString WorkingDirPath;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "NEAT Evolution Parameters")
 	float weightMutationProb = 0.8;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "NEAT Evolution Parameters")
@@ -86,8 +91,39 @@ public:
 	UPROPERTY()
 	TArray<APlatformAndBoxesSandbox*> CurrentEvaluatedSandboxes;
 
+	UPROPERTY(BlueprintReadOnly)
+	TArray<float> CurrentSpeciesDistribution;
+
+	UPROPERTY(BlueprintReadOnly)
+	FNeuralMap CurrentNeuralMap;
+	
 	UFUNCTION(BlueprintCallable)
 	void ChangeTrainingMode(TrainingMode newMode);
+
+	UFUNCTION(BlueprintCallable)
+	void SelectNeuralMap(int Index);
+
+	UFUNCTION(BlueprintCallable)
+	int GetCurrentEpoch() const;
+	UFUNCTION(BlueprintCallable)
+	bool IsComplexifying() const;
+	UFUNCTION(BlueprintCallable)
+	float GetBestFitness() const;
+	UFUNCTION(BlueprintCallable)
+	float GetChampionFitness() const;
+	UFUNCTION(BlueprintCallable)
+	float GetMeanFitness() const;
+	UFUNCTION(BlueprintCallable)
+	float GetMeanComplexity() const;
+	UFUNCTION(BlueprintCallable)
+	float GetMeanEvaluationDuration() const;
+
+	UFUNCTION(BlueprintCallable)
+	float GetEvaluationPerSec() const;
+	UFUNCTION(BlueprintCallable)
+	float GetTotalEvaluations() const;
+	UFUNCTION(BlueprintCallable)
+	float GetTotalEvaluationTime() const;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -99,12 +135,14 @@ public:
 private:
 	
 	TrainingMode _trainingMode;
-	int _epoch;
 	std::shared_ptr<flux::NeatActivityUnit> _neatActivity;
 	std::unique_ptr<flux::NeatActivityTrainer> _trainer;
 	std::shared_ptr<flux::SingleActivityBlackBox> _blackBox;
 	
 	UPROPERTY()
 	APlatformAndBoxesSandbox *_sandbox;
+
+	UPROPERTY()
+	TArray<UNeatEntityEntry*> _currentEntities;
 
 };
