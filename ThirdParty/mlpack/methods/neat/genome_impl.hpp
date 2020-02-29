@@ -31,7 +31,23 @@ std::map<std::pair<size_t, size_t>, size_t> Genome<ActivationFunction>::
 
 // Default constructor for the Genome object.
 template <class ActivationFunction>
-Genome<ActivationFunction>::Genome()
+Genome<ActivationFunction>::Genome():
+    inputNodeCount(0),
+    outputNodeCount(0),
+    initialWeight(0.0),
+    nextNodeID(0),
+    bias(0.0),
+    weightMutationProb(0.0),
+    weightMutationSize(0.0),
+    biasMutationProb(0.0),
+    biasMutationSize(0.0),
+    nodeAdditionProb(0.0),
+    nodeDeletionProb(0.0),
+    fitness(0.0),
+    connAdditionProb(0.0),
+    connDeletionProb(0.0),
+    isAcyclic(true),
+    connCount(0)
 { /* Nothing to do here */ }
 
 // Creates genome object during initialization.
@@ -57,6 +73,8 @@ Genome<ActivationFunction>::Genome(const size_t inputNodeCount,
     biasMutationProb(biasMutationProb),
     biasMutationSize(biasMutationSize),
     nodeAdditionProb(nodeAdditionProb),
+    nodeDeletionProb(0.0),
+    fitness(0.0),
     connAdditionProb(connAdditionProb),
     connDeletionProb(connDeletionProb),
     isAcyclic(isAcyclic)
@@ -121,6 +139,7 @@ Genome<ActivationFunction>::Genome(std::vector<ConnectionGene>&
     connectionGeneList(connectionGeneList),
     inputNodeCount(inputNodeCount),
     outputNodeCount(outputNodeCount),
+    initialWeight(0.0),
     nextNodeID(nextNodeID),
     bias(bias),
     weightMutationProb(weightMutationProb),
@@ -128,6 +147,8 @@ Genome<ActivationFunction>::Genome(std::vector<ConnectionGene>&
     biasMutationProb(biasMutationProb),
     biasMutationSize(biasMutationSize),
     nodeAdditionProb(nodeAdditionProb),
+    nodeDeletionProb(0.0),
+    fitness(0.0),
     connAdditionProb(connAdditionProb),
     connDeletionProb(connDeletionProb),
     isAcyclic(isAcyclic),
@@ -169,6 +190,7 @@ Genome<ActivationFunction>::Genome(std::vector<ConnectionGene>&
                                    const bool isAcyclic):
     connectionGeneList(connectionGeneList),
     nodeDepths(nodeDepths),
+    initialWeight(0.0),
     inputNodeCount(inputNodeCount),
     outputNodeCount(outputNodeCount),
     nextNodeID(nextNodeID),
@@ -178,6 +200,8 @@ Genome<ActivationFunction>::Genome(std::vector<ConnectionGene>&
     biasMutationProb(biasMutationProb),
     biasMutationSize(biasMutationSize),
     nodeAdditionProb(nodeAdditionProb),
+    nodeDeletionProb(0.0),
+    fitness(0.0),
     connAdditionProb(connAdditionProb),
     connDeletionProb(connDeletionProb),
     isAcyclic(isAcyclic),
@@ -493,6 +517,7 @@ void Genome<ActivationFunction>::serialize(Archive& ar,
   ar & BOOST_SERIALIZATION_NVP(nodeAdditionProb);
   ar & BOOST_SERIALIZATION_NVP(connAdditionProb);
   ar & BOOST_SERIALIZATION_NVP(connDeletionProb);
+  ar & BOOST_SERIALIZATION_NVP(nodeDeletionProb);
   ar & BOOST_SERIALIZATION_NVP(fitness);
   ar & BOOST_SERIALIZATION_NVP(isAcyclic);
   ar & BOOST_SERIALIZATION_NVP(connCount);

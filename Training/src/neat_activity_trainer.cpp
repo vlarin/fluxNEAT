@@ -107,4 +107,9 @@ const flux::NeatEvolutionParameters &flux::NeatActivityTrainer::GetEvolutionPara
     return _impl->GetEvolutionParameters();
 }
 
+void flux::NeatActivityTrainer::DumpState(std::ostream &stream) const
+{
+    _impl->DumpState(stream);
+}
+
 flux::NeatActivityTrainer::~NeatActivityTrainer() = default;

@@ -179,9 +179,9 @@ void APlatformAndBoxesTrainer::ChangeTrainingMode(TrainingMode newMode)
 
 		_trainingMode = newMode;
 		UE_LOG(LogTemp, Log, TEXT("Initializing complete. Enabling platform sandboxes:"));
-
-		UE_LOG(LogTemp, Log, TEXT("Enabled. Starting training..."));
+        
 		_trainer->Step(0.0001);
+        UE_LOG(LogTemp, Log, TEXT("Enabled. Starting training..."));
 	}
 	else if (newMode == TM_REVIEW)
 	{

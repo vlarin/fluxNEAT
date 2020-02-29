@@ -164,8 +164,7 @@ void NEAT<TaskType, ActivationFunction, SelectionPolicy>::ForceInit()
         Genome<ActivationFunction>::mutationBuffer.clear();
 
         Initialize();
-        speciesList = std::vector<std::vector<Genome<ActivationFunction>>>
-                (numSpecies);
+        speciesList = std::vector<std::vector<Genome<ActivationFunction>>>(numSpecies);
         Speciate(true);
     }
     else
