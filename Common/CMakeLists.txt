@@ -14,6 +14,7 @@ add_library(fluxNEAT.Common
         include/flux/common.h
         src/neural_input.cpp
         src/neural_output.cpp
+        src/mediator_value.cpp
         src/context_unit.cpp
         src/manual_raw_input.cpp
         src/single_activity_black_box.cpp
@@ -33,13 +34,14 @@ add_library(fluxNEAT.Common
         include/flux/augmented_sensor_unit.h
         include/flux/activity_unit.h
         include/flux/feedback/feedback_unit.h
+        include/flux/feedback/mediator_value.h
         include/flux/manual/unit_context.h
         include/flux/manual/manual_raw_input_unit.h
         include/flux/manual/single_activity_black_box.h
         include/flux/neat/neat_activity_unit.h
         include/flux/neat/neat_entity_descriptor.h
         include/flux/context_registry.h
-        include/flux/global_error.h)
+        include/flux/global_error.h )
 
 target_link_libraries(fluxNEAT.Common ${Boost_LIBRARIES})
 target_include_directories(fluxNEAT.Common PUBLIC ${CMAKE_SOURCE_DIR}/Common/include)

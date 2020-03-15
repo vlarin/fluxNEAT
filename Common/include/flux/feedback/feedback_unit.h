@@ -7,10 +7,12 @@
 
 #include <flux/prereq.h>
 #include <flux/neural_input.h>
+#include <flux/feedback/mediator_value.h>
 
 #include <set>
 
-namespace flux {
+namespace flux
+{
 
     /**
      * Feedback unit interface that provides multi-dimensional feedback to the cortex
@@ -19,7 +21,8 @@ namespace flux {
     {
     public:
         virtual std::set<NeuralInputId> GetInputIds() const = 0;
-    };
 
+        virtual std::vector<MediatorValue> Activate(const std::vector<NeuralInput> &inputs) const = 0;
+    };
 }
 #endif //FLUXNEAT_FEEDBACK_UNIT_H
