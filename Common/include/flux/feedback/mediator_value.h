@@ -27,7 +27,7 @@ namespace flux
     {
     private:
         MediatorId mediator;
-        float_fl value{};
+        float_fl value;
     public:
         MediatorValue() = default;
         explicit MediatorValue(MediatorId input);
