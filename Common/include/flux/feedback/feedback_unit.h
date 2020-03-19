@@ -13,12 +13,13 @@
 
 namespace flux
 {
-
     /**
      * Feedback unit interface that provides multi-dimensional feedback to the cortex
      */
-    class FLUX_API IFeedbackUnit
+    class FLUX_API IFeedbackUnit : public IContextUnit
     {
+    protected:
+        IFeedbackUnit(std::string id, std::shared_ptr<IContext> context) : IContextUnit(std::move(id), std::move(context)) {}
     public:
         virtual std::set<NeuralInputId> GetInputIds() const = 0;
 
