@@ -9,11 +9,13 @@
 #include <flux/neural_input.h>
 #include <flux/feedback/mediator_value.h>
 #include <flux/cortex/cortex_feedback.h>
+#include <flux/cortex/cortex_transition.h>
 
 namespace flux
 {
     /**
      * Cortex state holder. Created when a new strong feedback received. Keeps mediator averages and input trusted intervals
+     * TODO: serialization, intermediate columns for transition bounds
      */
     class FLUX_API CortexColumn
     {
