@@ -109,6 +109,7 @@ void flux::NeatActivityTrainer::NeatActivityTrainerImpl::Step(flux::float_fl del
             }
 
             _totalEvaluations++;
+            _currentEvaluations[i].Entity->ResetActivityBound();
             _trainingPool->ReleaseContext(*_currentEvaluations[i].Entity->GetContext());
             _currentEvaluations.erase(_currentEvaluations.begin() + i);
         }
@@ -187,6 +188,7 @@ void flux::NeatActivityTrainer::NeatActivityTrainerImpl::EmplaceForEvaluation(Ev
     oar << _training.Genomes()[entry.Index];
 
     entry.Entity->UpdateChildScheme(_targetId, stream);
+    entry.Entity->SetActivityBound(_targetId);
 
     _currentEvaluations.emplace_back(entry);
 }

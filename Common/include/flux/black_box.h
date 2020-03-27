@@ -34,6 +34,17 @@ namespace flux {
 
         virtual void Step() = 0;
         virtual void UpdateChildScheme(std::string childId, std::istream &istream) = 0;
+
+        /**
+         * Manual mode control that allows to bind black box execution to the single activity
+         * @param activityId
+         */
+        virtual void SetActivityBound(std::string activityId) {}
+
+        /**
+         * Reset manual activity bound
+         */
+        virtual void ResetActivityBound() {}
     };
 }
 #endif //FLUXNEAT_BLACK_BOX_H

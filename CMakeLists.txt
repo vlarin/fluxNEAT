@@ -54,5 +54,8 @@ add_subdirectory(Common)
 # fluxNEAT Evolution Training
 add_subdirectory(Training)
 
+# fluxNEAT Cortex Azu
+add_subdirectory(Cortex)
+
 # fluxNEAT Console Sandbox
 add_subdirectory(Sandbox)
