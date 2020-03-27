@@ -37,6 +37,9 @@ namespace flux
                 const std::map<NeuralInputId, NeuralInput> &desiredContext,
                 const std::map<MediatorId, MediatorValue> &mediators) const;
 
+        bool IsWanderingViable(const std::map<NeuralInputId, NeuralInput> &currentContext,
+                               const std::map<MediatorId, MediatorValue> &mediators) const;
+
         /**
          * Basic cortex transitions keep initial context variation without
          * exact goal but this method allows to create targeted transition that are keep in a decision making core of the cortex
@@ -46,6 +49,8 @@ namespace flux
          */
         CortexTargetedTransition CreateInstance(const std::map<NeuralInputId, NeuralInput> &initialContext,
                 const std::map<NeuralInputId, NeuralInput> &desiredContext) const;
+        
+        CortexTargetedTransition CreateWanderingInstance(const std::map<NeuralInputId, NeuralInput> &initialContext) const;
 
         inline std::string GetId() const { return _id; }
         inline std::string GetActivityId() const { return _activityId; }

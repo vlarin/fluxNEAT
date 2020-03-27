@@ -22,6 +22,7 @@ namespace flux
                                   std::string activityId,
                                   std::map<NeuralInputId, NeuralInput> initialSequence,
                                   std::map<NeuralInputId, NeuralInput> desiredSequence);
+        explicit CortexTargetedTransition();
 
         inline std::string GetId() const { return _id; }
         inline std::string GetActivityId() const { return _activityId; }

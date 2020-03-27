@@ -1,5 +1,7 @@
 #include <flux/cortex/cortex_transition.h>
 
+#include <armadillo>
+
 flux::CortexTransition::CortexTransition(std::string id, std::string activityId,
                                          std::map<NeuralInputId, NeuralInput> initialSequence,
                                          std::map<NeuralInputId, float_fl> initialVariation,
@@ -20,6 +22,23 @@ flux::CortexTransition::CreateInstance(const std::map<NeuralInputId, NeuralInput
                                        const std::map<NeuralInputId, NeuralInput> &desiredContext) const
 {
     return CortexTargetedTransition(_id, _activityId, initialContext, desiredContext);
+}
+
+
+flux::CortexTargetedTransition
+flux::CortexTransition::CreateWanderingInstance(const std::map<NeuralInputId, NeuralInput> &initialContext) const
+{
+    auto mutatedDesiredSequence = _desiredSequence;
+    for (auto &desired : mutatedDesiredSequence)
+    {
+        const auto variation = _desiredVariation.find(desired.first);
+        if (variation != _desiredVariation.end())
+        {
+            const float_fl random = arma::mat(1, 1, arma::fill::randu)(0,0);
+            desired.second.Apply(variation->second * random - (variation->second / 2.0));
+        }
+    }
+    return CreateInstance(initialContext, mutatedDesiredSequence);
 }
 
 bool flux::CortexTransition::IsViable(const std::map<NeuralInputId, NeuralInput> &currentContext,
@@ -59,4 +78,10 @@ bool flux::CortexTransition::IsViable(const std::map<NeuralInputId, NeuralInput>
     }
 
     return true;
+}
+
+bool flux::CortexTransition::IsWanderingViable(const std::map<NeuralInputId, NeuralInput> &currentContext,
+                                               const std::map<MediatorId, MediatorValue> &mediators) const
+{
+    return IsViable(currentContext, std::map<NeuralInputId, NeuralInput>(), mediators);
 }

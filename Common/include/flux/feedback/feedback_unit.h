@@ -6,6 +6,7 @@
 #define FLUXNEAT_FEEDBACK_UNIT_H
 
 #include <flux/prereq.h>
+#include <flux/context_unit.h>
 #include <flux/neural_input.h>
 #include <flux/feedback/mediator_value.h>
 

@@ -6,3 +6,5 @@ flux::CortexTargetedTransition::CortexTargetedTransition(std::string id, std::st
                                                          : _id(std::move(id)), _activityId(std::move(activityId)),
                                                          _initialSequence(std::move(initialSequence)),
                                                          _expectedSequence(std::move(desiredSequence)) {}
+
+flux::CortexTargetedTransition::CortexTargetedTransition() = default;
