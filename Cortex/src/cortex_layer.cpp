@@ -21,11 +21,12 @@ const std::vector<flux::CortexColumn> &flux::CortexLayer::GetExcitedColumns() co
     return _columns;
 }
 
-void flux::CortexLayer::Step(const std::map<NeuralInputId, NeuralInput> &context)
+void flux::CortexLayer::Step(const std::map<NeuralInputId, NeuralInput> &context,
+                             const std::map<MediatorId, MediatorValue> &mediators)
 {
     for (auto &column : _columns)
     {
-        column.Step(context);
+        column.Step(context, mediators);
     }
 
     //Update excitement priorities

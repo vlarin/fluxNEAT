@@ -9,7 +9,8 @@
 #include <flux/context_unit.h>
 #include <flux/activity_unit.h>
 
-namespace flux {
+namespace flux
+{
     /**
      * Represents generic usage NEAT activity unit a.k.a. ActionSwitcher. Chooses one of possible outputs with inputs provided
      */

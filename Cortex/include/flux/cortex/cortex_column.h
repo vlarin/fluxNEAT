@@ -27,6 +27,7 @@ namespace flux
 
         inline size_t GetId() const { return _id; }
         inline float_fl GetExcitementLevel() const { return _excitementLevel; }
+        inline const std::map<NeuralInputId, NeuralInput> &GetContext() const { return _pivot; }
 
         /**
          * Try to merge new captured feedback state into this column. This method will try to expand trusted intervals
@@ -40,7 +41,8 @@ namespace flux
                 const std::map<NeuralInputId, NeuralInput> &context,
                 const std::map<MediatorId, MediatorValue> &mediators);
 
-        void Step(const std::map<NeuralInputId, NeuralInput> &context);
+        void Step(const std::map<NeuralInputId, NeuralInput> &context,
+                  const std::map<MediatorId, MediatorValue> &mediators);
 
         bool operator <(const CortexColumn &other) const;
         bool operator >(const CortexColumn &other) const;

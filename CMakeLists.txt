@@ -59,3 +59,6 @@ add_subdirectory(Cortex)
 
 # fluxNEAT Console Sandbox
 add_subdirectory(Sandbox)
+
+# fluxNEAT Console Cortex Sandbox
+add_subdirectory(CortexSandbox)

@@ -34,8 +34,8 @@ flux::CortexTransition::CreateWanderingInstance(const std::map<NeuralInputId, Ne
         const auto variation = _desiredVariation.find(desired.first);
         if (variation != _desiredVariation.end())
         {
-            const float_fl random = arma::mat(1, 1, arma::fill::randu)(0,0);
-            desired.second.Apply(variation->second * random - (variation->second / 2.0));
+            float_fl random = arma::mat(1, 1, arma::fill::randu)(0,0);
+            desired.second.Apply((2 * variation->second) * random - variation->second);
         }
     }
     return CreateInstance(initialContext, mutatedDesiredSequence);
@@ -55,12 +55,20 @@ bool flux::CortexTransition::IsViable(const std::map<NeuralInputId, NeuralInput>
         }
     }
 
-    //check initial context allowance
+    //check initial and cross context allowance
     for (const auto &input : currentContext)
     {
         auto rangedInput = _initialSequence.find(input.first);
         auto range = _initialVariation.find(input.first);
+        auto desired = desiredContext.find(input.first);
         if (rangedInput != _initialSequence.end() && fabs(input.second.GetValue() - rangedInput->second.GetValue()) > range->second)
+        {
+            return false;
+        }
+
+        //cross context disallowance
+        if (rangedInput == _initialSequence.end() && desired != desiredContext.end() &&
+            fabs(input.second.GetValue() - desired->second.GetValue()) > 0.001)
         {
             return false;
         }

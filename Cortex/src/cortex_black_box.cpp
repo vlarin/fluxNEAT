@@ -58,9 +58,17 @@ void flux::CortexBlackBox::Step()
     }
 
     //reapply saved context
-    for (const auto &context : savedContext)
+    for (const auto &context : _contextInputIds)
     {
-        _sensors[context.first] = context.second;
+        const auto savedInput = savedContext.find(context);
+        if (savedInput != savedContext.end())
+        {
+            _sensors[context] = savedInput->second;
+        }
+        else
+        {
+            _sensors.insert(std::make_pair(context, NeuralInput(context)));
+        }
     }
 
     //fetch raw sensors data
@@ -112,6 +120,36 @@ void flux::CortexBlackBox::Step()
     FetchFeedback(_sensors);
     _cortexDecisionLayer.Step(_sensors, _mediators);
 
+    float_fl maxMediator = 0.0;
+    for (const auto &mediator : _mediators)
+    {
+        if (mediator.second.GetValue() > maxMediator)
+        {
+            maxMediator = mediator.second.GetValue();
+        }
+    }
+
+    if (maxMediator > 0.98)
+    {
+        _cortexLayer.GrowOrMerge(_sensors, _mediators);
+    }
+    _cortexLayer.Step(_sensors, _mediators);
+
+    bool isTransitionAvailable = false;
+    for (const auto &excitedColumn : _cortexLayer.GetExcitedColumns())
+    {
+        if (_cortexDecisionLayer.TryMakeDecision(_sensors, excitedColumn.GetContext(), _mediators))
+        {
+            isTransitionAvailable = true;
+            break;
+        }
+    }
+
+    if (!isTransitionAvailable)
+    {
+        _cortexDecisionLayer.StartWandering(_sensors, _mediators);
+    }
+
     auto activityUnitId = _cortexDecisionLayer.GetCurrentTransition().GetActivityId();
     auto contextTarget = _cortexDecisionLayer.GetCurrentTransition().GetDesiredContext();
 
@@ -124,6 +162,24 @@ void flux::CortexBlackBox::Step()
             _sensors[contextInput] = input->second;
         }
     }
+
+    //fetch updated feedback after desired action
+    FetchFeedback(_sensors);
+    maxMediator = 0.0;
+    for (const auto &mediator : _mediators)
+    {
+        if (mediator.second.GetValue() > maxMediator)
+        {
+            maxMediator = mediator.second.GetValue();
+        }
+    }
+
+    if (maxMediator > 0.98)
+    {
+        _cortexLayer.GrowOrMerge(_sensors, _mediators);
+    }
+    _cortexLayer.Step(_sensors, _mediators);
+
 
     auto activityUnit = _activityUnits[activityUnitId];
 
@@ -294,7 +350,7 @@ void flux::CortexBlackBox::FetchFeedback(const std::map<NeuralInputId, NeuralInp
         {
             if (mediatorsDelta.find(delta.GetMediator()) != mediatorsDelta.end())
             {
-                mediatorsDelta[delta.GetMediator()].Merge(delta);
+                mediatorsDelta[delta.GetMediator()] = delta;
             }
             else
             {

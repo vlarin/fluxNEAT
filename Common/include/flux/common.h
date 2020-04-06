@@ -20,6 +20,7 @@
 #include <flux/manual/unit_context.h>
 #include <flux/manual/manual_raw_input_unit.h>
 #include <flux/manual/single_activity_black_box.h>
+#include <flux/manual/identity_activity_unit.h>
 
 #include <flux/neat/neat_activity_unit.h>
 #include <flux/neat/neat_entity_descriptor.h>

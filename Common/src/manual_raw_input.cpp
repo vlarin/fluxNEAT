@@ -9,7 +9,8 @@ ManualRawInputSensor::ManualRawInputSensor(
         std::set<NeuralInputId> inputIds,
         bool verbose)
         : IRawSensorUnit(std::move(id), std::move(context)), _inputIds(std::move(inputIds)), _currentSequenceId(0),
-        _verbose(verbose)
+        _verbose(verbose),
+        _isAutoPlayed(true)
 {}
 
 std::vector<NeuralInput> ManualRawInputSensor::Fetch() const
@@ -20,7 +21,11 @@ std::vector<NeuralInput> ManualRawInputSensor::Fetch() const
         return std::vector<NeuralInput>();
     }
 
-    std::vector<NeuralInput> inputs = _inputSequences[_currentSequenceId++ % _inputSequences.size()];
+    if (_isAutoPlayed)
+    {
+        _currentSequenceId++;
+    }
+    std::vector<NeuralInput> inputs = _inputSequences[_currentSequenceId % _inputSequences.size()];
 
     //TODO: Own logger?
     if (_verbose)
@@ -54,4 +59,9 @@ void ManualRawInputSensor::SetInputsSequence(std::vector<std::vector<NeuralInput
 std::shared_ptr<IContextUnit> ManualRawInputSensor::Clone(std::shared_ptr<IContext> context) const
 {
     return CloneToContext<ManualRawInputSensor>(context);
+}
+
+void ManualRawInputSensor::Step()
+{
+    _currentSequenceId++;
 }

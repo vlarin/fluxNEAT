@@ -21,6 +21,7 @@ add_library(fluxNEAT.Common
         src/neat_activity_unit.cpp
         src/neat_activity_unit_impl.cpp
         src/neat_entity_descriptor.cpp
+        src/identity_activity_unit.cpp
         src/global_error.cpp
 
         src/include/neat_activity_unit_impl.h
@@ -41,7 +42,8 @@ add_library(fluxNEAT.Common
         include/flux/neat/neat_activity_unit.h
         include/flux/neat/neat_entity_descriptor.h
         include/flux/context_registry.h
-        include/flux/global_error.h )
+        include/flux/global_error.h
+        include/flux/manual/identity_activity_unit.h)
 
 target_link_libraries(fluxNEAT.Common ${Boost_LIBRARIES})
 target_include_directories(fluxNEAT.Common PUBLIC ${CMAKE_SOURCE_DIR}/Common/include)

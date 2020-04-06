@@ -25,7 +25,8 @@ namespace flux
                 const std::map<MediatorId, MediatorValue> &mediators);
 
         const std::vector<CortexColumn> &GetExcitedColumns() const;
-        void Step(const std::map<NeuralInputId, NeuralInput> &context);
+        void Step(const std::map<NeuralInputId, NeuralInput> &context,
+                  const std::map<MediatorId, MediatorValue> &mediators);
     private:
         std::vector<CortexColumn> _columns;
     };

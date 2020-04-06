@@ -157,8 +157,10 @@ bool flux::CortexColumn::TryMerge(const std::map<NeuralInputId, NeuralInput> &co
     return false;
 }
 
-void flux::CortexColumn::Step(const std::map<NeuralInputId, NeuralInput> &context)
+void flux::CortexColumn::Step(const std::map<NeuralInputId, NeuralInput> &context,
+                              const std::map<MediatorId, MediatorValue> &mediators)
 {
+    TryMerge(context, mediators);
     _excitementLevel += CalculateActivationValue(context);
     _excitementLevel *= STANDARD_DECAY;
 
