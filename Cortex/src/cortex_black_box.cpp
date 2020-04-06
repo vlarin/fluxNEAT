@@ -38,12 +38,32 @@ void flux::CortexBlackBox::AddOutput(std::shared_ptr<IOutputUnit> output)
 
 void flux::CortexBlackBox::Step()
 {
-    //TODO: validation
+    //TODO: Input scheme validation?
+
+    //save context input from last run
+    std::map<NeuralInputId, NeuralInput> savedContext;
+    for (auto &contextInput : _contextInputIds)
+    {
+        const auto input = _sensors.find(contextInput);
+        if (input != _sensors.end())
+        {
+            savedContext.insert(std::make_pair(input->first, input->second));
+        }
+    }
+
+    //reset last sensors data
     for (auto &input : _sensors)
     {
         input.second.Reset();
     }
 
+    //reapply saved context
+    for (const auto &context : savedContext)
+    {
+        _sensors[context.first] = context.second;
+    }
+
+    //fetch raw sensors data
     for (const auto &input : _rawInputs)
     {
         std::vector<NeuralInput> raw = input->Fetch();
@@ -60,6 +80,7 @@ void flux::CortexBlackBox::Step()
         }
     }
 
+    //fetch augmented sensors data
     for (const auto &input : _augmentedInputs)
     {
         std::vector<NeuralInput> augmentedPreInputs;
@@ -92,6 +113,18 @@ void flux::CortexBlackBox::Step()
     _cortexDecisionLayer.Step(_sensors, _mediators);
 
     auto activityUnitId = _cortexDecisionLayer.GetCurrentTransition().GetActivityId();
+    auto contextTarget = _cortexDecisionLayer.GetCurrentTransition().GetDesiredContext();
+
+    //apply desired context target
+    for (auto &contextInput : _contextInputIds)
+    {
+        const auto input = contextTarget.find(contextInput);
+        if (input != contextTarget.end())
+        {
+            _sensors[contextInput] = input->second;
+        }
+    }
+
     auto activityUnit = _activityUnits[activityUnitId];
 
     std::vector<NeuralInput> preInputs;
