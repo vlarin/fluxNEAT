@@ -46,7 +46,7 @@ bool flux::CortexColumn::TryMerge(const std::map<NeuralInputId, NeuralInput> &co
         currentMediators.emplace_back(mediator.second);
     }
 
-    bool isMediationFitting = CalculateMediationSqrDifference(currentMediators, averages) > MEDIATION_THRESHOLD_SQR;
+    bool isMediationFitting = CalculateMediationSqrDifference(currentMediators, averages) <= MEDIATION_THRESHOLD_SQR;
 
     float_fl activationValue = CalculateActivationValue(context);
     if (activationValue >= 1 && isMediationFitting)
