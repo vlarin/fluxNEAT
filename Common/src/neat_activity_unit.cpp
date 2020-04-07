@@ -1,17 +1,17 @@
 #include "flux/neat/neat_activity_unit.h"
 #include "include/neat_activity_unit_impl.h"
 
-std::set<flux::NeuralInputId> flux::NeatActivityUnit::GetInputIds() const
+std::set<flux::NeuralNodeId> flux::NeatActivityUnit::GetInputIds() const
 {
     return _inputIds;
 }
 
-std::set<flux::NeuralOutputId> flux::NeatActivityUnit::GetOutputIds() const
+std::set<flux::NeuralNodeId> flux::NeatActivityUnit::GetOutputIds() const
 {
     return _outputIds;
 }
 
-std::vector<flux::NeuralOutput> flux::NeatActivityUnit::Activate(const std::vector<NeuralInput> &inputs) const
+std::vector<flux::NeuralNode> flux::NeatActivityUnit::Activate(const std::vector<NeuralNode> &inputs) const
 {
     arma::vec inputVector(inputs.size());
     for (int i = 0; i < inputs.size(); i++)
@@ -20,12 +20,12 @@ std::vector<flux::NeuralOutput> flux::NeatActivityUnit::Activate(const std::vect
     }
 
     arma::vec outputVector = _impl->Activate(inputVector);
-    std::vector<NeuralOutput> outputs;
+    std::vector<NeuralNode> outputs;
 
     int index = 0;
     for (const auto &outputId : _outputIds)
     {
-        outputs.emplace_back(NeuralOutput(outputId, outputVector[index]));
+        outputs.emplace_back(NeuralNode(outputId, outputVector[index]));
         index++;
     }
 
@@ -33,8 +33,8 @@ std::vector<flux::NeuralOutput> flux::NeatActivityUnit::Activate(const std::vect
 }
 
 flux::NeatActivityUnit::NeatActivityUnit(const std::string &id, const std::shared_ptr<IContext> &context,
-                                         const std::set<NeuralInputId> &inputIds,
-                                         const std::set<NeuralOutputId> &outputIds)
+                                         const std::set<NeuralNodeId> &inputIds,
+                                         const std::set<NeuralNodeId> &outputIds)
                                          : IActivityUnit(id, context),
                                          _inputIds(inputIds),
                                          _outputIds(outputIds)

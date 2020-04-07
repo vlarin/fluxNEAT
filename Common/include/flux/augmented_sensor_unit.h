@@ -6,7 +6,7 @@
 #define FLUXNEAT_AUGMENTED_SENSOR_UNIT_H
 
 #include <flux/prereq.h>
-#include <flux/neural_input.h>
+#include <flux/neural_node.h>
 #include <flux/context_unit.h>
 
 #include <set>
@@ -21,10 +21,10 @@ namespace flux {
     protected:
         IAugmentedSensorUnit(std::string id, std::shared_ptr<IContext> context) : IContextUnit(std::move(id), std::move(context)) {}
     public:
-        virtual std::set<NeuralInputId> GetInputIds() const = 0;
-        virtual std::set<NeuralInputId> GetAugmentedInputIds() const = 0;
+        virtual std::set<NeuralNodeId> GetInputIds() const = 0;
+        virtual std::set<NeuralNodeId> GetAugmentedInputIds() const = 0;
 
-        virtual std::vector<NeuralInput> ApplyAugmentation(const std::vector<NeuralInput> &rawInputs) const = 0;
+        virtual std::vector<NeuralNode> ApplyAugmentation(const std::vector<NeuralNode> &rawInputs) const = 0;
     };
 
 }

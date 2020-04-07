@@ -5,15 +5,14 @@ generate_product_version(fluxNeat-Common-ProductVersionFiles
         VERSION_MAJOR 0
         VERSION_MINOR 1
         VERSION_PATCH 0
-        VERSION_REVISION ${GIT_REV}
-        FILE_DESCRIPTION "fluxNEAT AI Common Library"
+        VERSION_REVISION 0
+        FILE_DESCRIPTION "fluxNEAT AI Common Library ${GIT_REV}"
         COMPANY_COPYRIGHT "Temporal Games Inc. (c) Copyright 2019-2020. All rights reserved."
         COMPANY_NAME "Temporal Games Inc.")
 
 add_library(fluxNEAT.Common
         include/flux/common.h
-        src/neural_input.cpp
-        src/neural_output.cpp
+        src/neural_node.cpp
         src/mediator_value.cpp
         src/context_unit.cpp
         src/manual_raw_input.cpp
@@ -21,12 +20,14 @@ add_library(fluxNEAT.Common
         src/neat_activity_unit.cpp
         src/neat_activity_unit_impl.cpp
         src/neat_entity_descriptor.cpp
+        src/identity_activity_unit.cpp
         src/global_error.cpp
 
         src/include/neat_activity_unit_impl.h
 
         ${fluxNeat-Common-ProductVersionFiles}
 
+        include/flux/neural_node.h
         include/flux/black_box.h
         include/flux/context_unit.h
         include/flux/output_unit.h
@@ -41,7 +42,8 @@ add_library(fluxNEAT.Common
         include/flux/neat/neat_activity_unit.h
         include/flux/neat/neat_entity_descriptor.h
         include/flux/context_registry.h
-        include/flux/global_error.h )
+        include/flux/global_error.h
+        include/flux/manual/identity_activity_unit.h)
 
 target_link_libraries(fluxNEAT.Common ${Boost_LIBRARIES})
 target_include_directories(fluxNEAT.Common PUBLIC ${CMAKE_SOURCE_DIR}/Common/include)

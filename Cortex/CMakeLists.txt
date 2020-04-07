@@ -5,8 +5,8 @@ generate_product_version(fluxNeat-Cortex-ProductVersionFiles
         VERSION_MAJOR 0
         VERSION_MINOR 1
         VERSION_PATCH 0
-        VERSION_REVISION ${GIT_REV}
-        FILE_DESCRIPTION "fluxNEAT AI Cortex Azu Library"
+        VERSION_REVISION 0
+        FILE_DESCRIPTION "fluxNEAT AI Cortex Azu Library ${GIT_REV}"
         COMPANY_COPYRIGHT "Temporal Games Inc. (c) Copyright 2019-2020. All rights reserved."
         COMPANY_NAME "Temporal Games Inc.")
 
@@ -16,6 +16,7 @@ add_library(fluxNEAT.Cortex
         src/cortex_targeted_transition.cpp
         src/cortex_column.cpp
         src/cortex_layer.cpp
+        src/cortex_decision_layer.cpp
 
         #src/include/neat_activity_unit_impl.h
 
@@ -25,7 +26,9 @@ add_library(fluxNEAT.Cortex
         include/flux/cortex/cortex_black_box.h
         include/flux/cortex/cortex_transition.h
         include/flux/cortex/cortex_targeted_transition.h
-        include/flux/cortex/cortex_layer.h include/flux/cortex/cortex_decision_layer.h src/cortex_decision_layer.cpp)
+        include/flux/cortex/cortex_layer.h
+        include/flux/cortex/cortex_decision_layer.h
+        include/flux/cortex.h)
 
 target_link_libraries(fluxNEAT.Cortex ${Boost_LIBRARIES})
 target_include_directories(fluxNEAT.Cortex PUBLIC ${CMAKE_SOURCE_DIR}/Common/include)

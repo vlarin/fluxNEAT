@@ -6,21 +6,26 @@ using namespace flux;
 ManualRawInputSensor::ManualRawInputSensor(
         std::string id,
         std::shared_ptr<IContext> context,
-        std::set<NeuralInputId> inputIds,
+        std::set<NeuralNodeId> inputIds,
         bool verbose)
         : IRawSensorUnit(std::move(id), std::move(context)), _inputIds(std::move(inputIds)), _currentSequenceId(0),
-        _verbose(verbose)
+        _verbose(verbose),
+        _isAutoPlayed(true)
 {}
 
-std::vector<NeuralInput> ManualRawInputSensor::Fetch() const
+std::vector<NeuralNode> ManualRawInputSensor::Fetch() const
 {
     if (_inputSequences.empty())
     {
         setLastError("Manual Input sequences are not initialized!");
-        return std::vector<NeuralInput>();
+        return std::vector<NeuralNode>();
     }
 
-    std::vector<NeuralInput> inputs = _inputSequences[_currentSequenceId++ % _inputSequences.size()];
+    if (_isAutoPlayed)
+    {
+        _currentSequenceId++;
+    }
+    std::vector<NeuralNode> inputs = _inputSequences[_currentSequenceId % _inputSequences.size()];
 
     //TODO: Own logger?
     if (_verbose)
@@ -28,7 +33,7 @@ std::vector<NeuralInput> ManualRawInputSensor::Fetch() const
         std::cout << "Manual black box input " << GetId() << ": ";
         for (const auto &input : inputs)
         {
-            std::cout << "[" << input.GetInputId().GetId() << ": " << input.GetValue() << "] ";
+            std::cout << "[" << input.GetNodeId().GetId() << ": " << input.GetValue() << "] ";
         }
         std::cout << std::endl;
     }
@@ -36,15 +41,15 @@ std::vector<NeuralInput> ManualRawInputSensor::Fetch() const
     return inputs;
 }
 
-void ManualRawInputSensor::SetInputs(const std::vector<NeuralInput> &inputs)
+void ManualRawInputSensor::SetInputs(const std::vector<NeuralNode> &inputs)
 {
     //TODO: ids validation?
-    _inputSequences = std::vector<std::vector<NeuralInput>>();
+    _inputSequences = std::vector<std::vector<NeuralNode>>();
     _inputSequences.emplace_back(inputs);
     _currentSequenceId = 0;
 }
 
-void ManualRawInputSensor::SetInputsSequence(std::vector<std::vector<NeuralInput>> inputSequence)
+void ManualRawInputSensor::SetInputsSequence(std::vector<std::vector<NeuralNode>> inputSequence)
 {
     //TODO: ids validation?
     _inputSequences = std::move(inputSequence);
@@ -54,4 +59,9 @@ void ManualRawInputSensor::SetInputsSequence(std::vector<std::vector<NeuralInput
 std::shared_ptr<IContextUnit> ManualRawInputSensor::Clone(std::shared_ptr<IContext> context) const
 {
     return CloneToContext<ManualRawInputSensor>(context);
+}
+
+void ManualRawInputSensor::Step()
+{
+    _currentSequenceId++;
 }

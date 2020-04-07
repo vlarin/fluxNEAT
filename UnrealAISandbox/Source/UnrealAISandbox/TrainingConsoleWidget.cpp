@@ -20,7 +20,7 @@ public:
 	explicit XorContext(const std::shared_ptr<ManualRawInputSensor>& origin) : UnitContext("xor"),
 		_inputStub(*std::static_pointer_cast<ManualRawInputSensor>(origin->Clone(origin->GetContext()))) {}
 
-	std::vector<NeuralInput> GetWorldInputs() const { return  _inputStub.Fetch(); }
+	std::vector<NeuralNode> GetWorldInputs() const { return  _inputStub.Fetch(); }
 
 	~XorContext() = default;
 private:
@@ -33,14 +33,16 @@ public:
 	DebugOutputUnit(const string &id, const shared_ptr<IContext> &context) : IEvaluationOutputUnit(id, context),
 		_evalutionCount(0), _error(0) {}
 
-	void Apply(const std::vector<flux::NeuralOutput> &outputs) const override
+    std::set<NeuralNodeId> GetOutputIds() const override { return std::set<NeuralNodeId> { NeuralNodeId("xor_value") }; };
+
+	void Apply(const std::map<flux::NeuralNodeId, flux::NeuralNode> &outputs) const override
 	{
 		auto world = std::static_pointer_cast<XorContext>(GetContext())->GetWorldInputs();
 		float_fl answer = (world[0].GetValue() + world[1].GetValue()) * (!world[0].GetValue() + !world[1].GetValue());
 
 		for (const auto &output : outputs)
 		{
-			_error += std::pow(answer - output.GetValue(), 2);
+            _error += std::pow(answer - output.second.GetValue(), 2);
 		}
 
 		++_evalutionCount;
@@ -167,22 +169,22 @@ void UTrainingConsoleWidget::TrainXOR()
 	auto context = std::make_shared<UnitContext>("Empty Context");
 	_blackBox = std::make_shared<SingleActivityBlackBox>("test", context);
 
-	NeuralInputId inputA("a");
-	NeuralInputId inputB("b");
-	set<NeuralInputId> inputIds = { inputA, inputB };
+	NeuralNodeId inputA("a");
+	NeuralNodeId inputB("b");
+	set<NeuralNodeId> inputIds = { inputA, inputB };
 	auto manualInput = std::make_shared<ManualRawInputSensor>("xor_emu", context, inputIds, true);
 
-	manualInput->SetInputsSequence(vector<vector<NeuralInput>>
+	manualInput->SetInputsSequence(vector<vector<NeuralNode>>
 	{
-		(vector<NeuralInput> { NeuralInput(inputA, 0), NeuralInput(inputB, 0) }),
-			(vector<NeuralInput> { NeuralInput(inputA, 1), NeuralInput(inputB, 0) }),
-			(vector<NeuralInput> { NeuralInput(inputA, 0), NeuralInput(inputB, 1) }),
-			(vector<NeuralInput> { NeuralInput(inputA, 1), NeuralInput(inputB, 1) })
+		(vector<NeuralNode> { NeuralNode(inputA, 0), NeuralNode(inputB, 0) }),
+			(vector<NeuralNode> { NeuralNode(inputA, 1), NeuralNode(inputB, 0) }),
+			(vector<NeuralNode> { NeuralNode(inputA, 0), NeuralNode(inputB, 1) }),
+			(vector<NeuralNode> { NeuralNode(inputA, 1), NeuralNode(inputB, 1) })
 	});
 
 	_blackBox->AddRawInput(manualInput);
 
-	set<NeuralOutputId> outputIds = { NeuralOutputId("xor_value") };
+	set<NeuralNodeId> outputIds = { NeuralNodeId("xor_value") };
 	auto neatActivity = std::make_shared<NeatActivityUnit>("xor", context, inputIds, outputIds);
 
 	_blackBox->AddActivity(neatActivity);

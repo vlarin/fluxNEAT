@@ -6,8 +6,7 @@
 #define FLUXNEAT_COMMON_H
 
 #include <flux/prereq.h>
-#include <flux/neural_input.h>
-#include <flux/neural_output.h>
+#include <flux/neural_node.h>
 
 #include <flux/context_registry.h>
 #include <flux/raw_sensor_unit.h>
@@ -20,6 +19,7 @@
 #include <flux/manual/unit_context.h>
 #include <flux/manual/manual_raw_input_unit.h>
 #include <flux/manual/single_activity_black_box.h>
+#include <flux/manual/identity_activity_unit.h>
 
 #include <flux/neat/neat_activity_unit.h>
 #include <flux/neat/neat_entity_descriptor.h>

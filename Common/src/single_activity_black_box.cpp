@@ -43,23 +43,23 @@ void flux::SingleActivityBlackBox::Step()
 
     for (const auto &input : _rawInputs)
     {
-        std::vector<NeuralInput> raw = input->Fetch();
+        std::vector<NeuralNode> raw = input->Fetch();
         for (const auto &rawInput : raw)
         {
-            if (_sensors.find(rawInput.GetInputId()) == _sensors.end())
+            if (_sensors.find(rawInput.GetNodeId()) == _sensors.end())
             {
-                _sensors.insert(std::make_pair(rawInput.GetInputId(), rawInput));
+                _sensors.insert(std::make_pair(rawInput.GetNodeId(), rawInput));
             }
             else
             {
-                _sensors[rawInput.GetInputId()].Apply(rawInput.GetValue());
+                _sensors[rawInput.GetNodeId()].Apply(rawInput.GetValue());
             }
         }
     }
 
     for (const auto &input : _augmentedInputs)
     {
-        std::vector<NeuralInput> augmentedPreInputs;
+        std::vector<NeuralNode> augmentedPreInputs;
         for (const auto &augmentedId : input->GetAugmentedInputIds())
         {
             if (_sensors.find(augmentedId) == _sensors.end())
@@ -71,16 +71,16 @@ void flux::SingleActivityBlackBox::Step()
             augmentedPreInputs.emplace_back(_sensors[augmentedId]);
         }
 
-        std::vector<NeuralInput> raw = input->ApplyAugmentation(augmentedPreInputs);
+        std::vector<NeuralNode> raw = input->ApplyAugmentation(augmentedPreInputs);
         for (const auto &rawInput : raw)
         {
-            if (_sensors.find(rawInput.GetInputId()) == _sensors.end())
+            if (_sensors.find(rawInput.GetNodeId()) == _sensors.end())
             {
-                _sensors.insert(std::make_pair(rawInput.GetInputId(), rawInput));
+                _sensors.insert(std::make_pair(rawInput.GetNodeId(), rawInput));
             }
             else
             {
-                _sensors[rawInput.GetInputId()].Apply(rawInput.GetValue());
+                _sensors[rawInput.GetNodeId()].Apply(rawInput.GetValue());
             }
         }
     }
@@ -91,7 +91,7 @@ void flux::SingleActivityBlackBox::Step()
         return;
     }
 
-    std::vector<NeuralInput> preInputs;
+    std::vector<NeuralNode> preInputs;
     for (const auto &inputId : _activityUnit->GetInputIds())
     {
         if (_sensors.find(inputId) == _sensors.end())
@@ -103,11 +103,7 @@ void flux::SingleActivityBlackBox::Step()
         preInputs.emplace_back(_sensors[inputId]);
     }
 
-    std::vector<NeuralOutput> outputs = _activityUnit->Activate(preInputs);
-    for (const auto &output : _outputs)
-    {
-        output->Apply(outputs);
-    }
+    std::vector<NeuralNode> outputs = _activityUnit->Activate(preInputs);
 
     for (auto &output : _responses)
     {
@@ -115,14 +111,19 @@ void flux::SingleActivityBlackBox::Step()
     }
     for (const auto &outputValue : outputs)
     {
-        if (_responses.find(outputValue.GetOutputId()) == _responses.end())
+        if (_responses.find(outputValue.GetNodeId()) == _responses.end())
         {
-            _responses.insert(std::make_pair(outputValue.GetOutputId(), outputValue));
+            _responses.insert(std::make_pair(outputValue.GetNodeId(), outputValue));
         }
 		else
 		{
-			_responses[outputValue.GetOutputId()].Apply(outputValue.GetValue());			
+			_responses[outputValue.GetNodeId()].Apply(outputValue.GetValue());
 		}
+    }
+
+    for (const auto &output : _outputs)
+    {
+        output->Apply(_responses);
     }
 }
 
@@ -173,12 +174,12 @@ std::shared_ptr<flux::IContextUnit> flux::SingleActivityBlackBox::Clone(std::sha
     return clone;
 }
 
-const flux::NeuralInput &flux::SingleActivityBlackBox::GetInputOf(std::string id) const
+const flux::NeuralNode &flux::SingleActivityBlackBox::GetInputOf(std::string id) const
 {
-    auto input = _sensors.find(NeuralInputId(id));
+    auto input = _sensors.find(NeuralNodeId(id));
     if (input == _sensors.end())
     {
-        static const NeuralInput empty(NeuralInputId("__invalid_input__"));
+        static const NeuralNode empty(NeuralNodeId("__invalid_input__"));
         setLastError(("Unable to fetch input id of - " + id).c_str());
         return empty;
     }
@@ -186,12 +187,12 @@ const flux::NeuralInput &flux::SingleActivityBlackBox::GetInputOf(std::string id
     return input->second;
 }
 
-const flux::NeuralOutput &flux::SingleActivityBlackBox::GetOutputOf(std::string id) const
+const flux::NeuralNode &flux::SingleActivityBlackBox::GetOutputOf(std::string id) const
 {
-    auto output = _responses.find(NeuralOutputId(id));
+    auto output = _responses.find(NeuralNodeId(id));
     if (output == _responses.end())
     {
-        static const NeuralOutput empty(NeuralOutputId("__invalid_output__"));
+        static const NeuralNode empty(NeuralNodeId("__invalid_output__"));
         setLastError(("Unable to fetch output id of - " + id).c_str());
         return empty;
     }

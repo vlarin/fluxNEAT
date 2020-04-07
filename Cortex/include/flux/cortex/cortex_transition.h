@@ -6,7 +6,7 @@
 #define FLUXNEAT_CORTEX_TRANSITION_H
 
 #include <flux/prereq.h>
-#include <flux/neural_input.h>
+#include <flux/neural_node.h>
 #include <flux/feedback/mediator_value.h>
 #include <flux/cortex/cortex_targeted_transition.h>
 
@@ -21,10 +21,10 @@ namespace flux
     public:
         explicit CortexTransition(std::string id,
                 std::string activityId,
-                std::map<NeuralInputId, NeuralInput> initialSequence,
-                std::map<NeuralInputId, float_fl> initialVariation,
-                std::map<NeuralInputId, NeuralInput> desiredSequence,
-                std::map<NeuralInputId, float_fl> desiredVariation,
+                std::map<NeuralNodeId, NeuralNode> initialSequence,
+                std::map<NeuralNodeId, float_fl> initialVariation,
+                std::map<NeuralNodeId, NeuralNode> desiredSequence,
+                std::map<NeuralNodeId, float_fl> desiredVariation,
                 std::map<MediatorId, MediatorValue> minimalMediatorValues);
 
         /**
@@ -33,11 +33,11 @@ namespace flux
          * @param mediators current mediators state
          * @return true if transition is possible, false otherwise
          */
-        bool IsViable(const std::map<NeuralInputId, NeuralInput> &currentContext,
-                const std::map<NeuralInputId, NeuralInput> &desiredContext,
+        bool IsViable(const std::map<NeuralNodeId, NeuralNode> &currentContext,
+                const std::map<NeuralNodeId, NeuralNode> &desiredContext,
                 const std::map<MediatorId, MediatorValue> &mediators) const;
 
-        bool IsWanderingViable(const std::map<NeuralInputId, NeuralInput> &currentContext,
+        bool IsWanderingViable(const std::map<NeuralNodeId, NeuralNode> &currentContext,
                                const std::map<MediatorId, MediatorValue> &mediators) const;
 
         /**
@@ -47,10 +47,10 @@ namespace flux
          * @param desiredContext
          * @return
          */
-        CortexTargetedTransition CreateInstance(const std::map<NeuralInputId, NeuralInput> &initialContext,
-                const std::map<NeuralInputId, NeuralInput> &desiredContext) const;
+        CortexTargetedTransition CreateInstance(const std::map<NeuralNodeId, NeuralNode> &initialContext,
+                const std::map<NeuralNodeId, NeuralNode> &desiredContext) const;
         
-        CortexTargetedTransition CreateWanderingInstance(const std::map<NeuralInputId, NeuralInput> &initialContext) const;
+        CortexTargetedTransition CreateWanderingInstance(const std::map<NeuralNodeId, NeuralNode> &initialContext) const;
 
         inline std::string GetId() const { return _id; }
         inline std::string GetActivityId() const { return _activityId; }
@@ -58,10 +58,10 @@ namespace flux
     private:
         std::string _id;
         std::string _activityId;
-        std::map<NeuralInputId, NeuralInput> _initialSequence;
-        std::map<NeuralInputId, float_fl> _initialVariation;
-        std::map<NeuralInputId, NeuralInput> _desiredSequence;
-        std::map<NeuralInputId, float_fl> _desiredVariation;
+        std::map<NeuralNodeId, NeuralNode> _initialSequence;
+        std::map<NeuralNodeId, float_fl> _initialVariation;
+        std::map<NeuralNodeId, NeuralNode> _desiredSequence;
+        std::map<NeuralNodeId, float_fl> _desiredVariation;
         std::map<MediatorId, MediatorValue> _minimalMediatorValues;
     };
 }

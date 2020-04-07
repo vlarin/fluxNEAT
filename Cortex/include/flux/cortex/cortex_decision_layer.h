@@ -17,10 +17,19 @@ namespace flux
     class FLUX_API CortexDecisionLayer
     {
     public:
+        CortexDecisionLayer();
+
         void AddBuiltinTransition(const CortexTransition &transition);
 
-        void Step(const std::map<NeuralInputId, NeuralInput> &context,
+        void Step(const std::map<NeuralNodeId, NeuralNode> &context,
                   const std::map<MediatorId, MediatorValue> &mediators);
+
+        bool TryMakeDecision(const std::map<NeuralNodeId, NeuralNode> &context,
+                             const std::map<NeuralNodeId, NeuralNode> &desiredContext,
+                             const std::map<MediatorId, MediatorValue> &mediators);
+
+        void StartWandering(const std::map<NeuralNodeId, NeuralNode> &context,
+                             const std::map<MediatorId, MediatorValue> &mediators);
 
         const CortexTargetedTransition &GetCurrentTransition() const;
 

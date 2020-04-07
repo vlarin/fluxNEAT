@@ -24,8 +24,10 @@ class FallingBoxesEvaluationUnit : public IEvaluationOutputUnit
 public:
 	FallingBoxesEvaluationUnit(const string &id, const shared_ptr<PlatformBoxesContext> &context) : IEvaluationOutputUnit(id, context)
 	{}
-
-	void Apply(const std::vector<flux::NeuralOutput> &outputs) const override
+    
+    std::set<NeuralNodeId> GetOutputIds() const override { return std::set<NeuralNodeId> { } ; }
+    
+	void Apply(const std::map<flux::NeuralNodeId, flux::NeuralNode> &outputs) const override
 	{
 	}
 
