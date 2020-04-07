@@ -8,11 +8,29 @@ flux::CortexBlackBox::CortexBlackBox(const std::string &id, std::shared_ptr<ICon
 void flux::CortexBlackBox::AddRawInput(std::shared_ptr<IRawSensorUnit> input)
 {
     _rawInputs.emplace_back(input);
+
+    for (const auto &inputId : input->GetInputIds())
+    {
+        const auto response = _sensors.find(inputId);
+        if (response == _sensors.end())
+        {
+            _sensors.insert(std::make_pair(inputId, NeuralNode(inputId)));
+        }
+    }
 }
 
 void flux::CortexBlackBox::AddAugmentedInput(std::shared_ptr<IAugmentedSensorUnit> input)
 {
     _augmentedInputs.emplace_back(input);
+
+    for (const auto &inputId : input->GetInputIds())
+    {
+        const auto response = _sensors.find(inputId);
+        if (response == _sensors.end())
+        {
+            _sensors.insert(std::make_pair(inputId, NeuralNode(inputId)));
+        }
+    }
 }
 
 void flux::CortexBlackBox::AddActivity(std::shared_ptr<IActivityUnit> activity)
@@ -24,32 +42,47 @@ void flux::CortexBlackBox::AddActivity(std::shared_ptr<IActivityUnit> activity)
     }
 
     _activityUnits.insert(std::make_pair(activity->GetId(), activity));
+    for (const auto &outputId : activity->GetOutputIds())
+    {
+        const auto response = _responses.find(outputId);
+        if (response == _responses.end())
+        {
+            _responses.insert(std::make_pair(outputId, NeuralNode(outputId)));
+        }
+    }
+
+    for (const auto &inputId : activity->GetInputIds())
+    {
+        const auto response = _sensors.find(inputId);
+        if (response == _sensors.end())
+        {
+            _sensors.insert(std::make_pair(inputId, NeuralNode(inputId)));
+        }
+    }
 }
 
 void flux::CortexBlackBox::AddFeedback(std::shared_ptr<IFeedbackUnit> feedback)
 {
-    _feedbacks.emplace_back(feedback);
+    _feedbacks.emplace_back(std::move(feedback));
 }
 
 void flux::CortexBlackBox::AddOutput(std::shared_ptr<IOutputUnit> output)
 {
     _outputs.emplace_back(output);
+
+    for (const auto &outputId : output->GetOutputIds())
+    {
+        const auto response = _responses.find(outputId);
+        if (response == _responses.end())
+        {
+            _responses.insert(std::make_pair(outputId, NeuralNode(outputId)));
+        }
+    }
 }
 
 void flux::CortexBlackBox::Step()
 {
     //TODO: Input scheme validation?
-
-    //save context input from last run
-    std::map<NeuralNodeId, NeuralNode> savedContext;
-    for (auto &contextInput : _contextInputIds)
-    {
-        const auto input = _sensors.find(contextInput);
-        if (input != _sensors.end())
-        {
-            savedContext.insert(std::make_pair(input->first, input->second));
-        }
-    }
 
     //reset last sensors data
     for (auto &input : _sensors)
@@ -57,17 +90,17 @@ void flux::CortexBlackBox::Step()
         input.second.Reset();
     }
 
-    //reapply saved context
-    for (const auto &context : _contextInputIds)
+    //reapply output context
+    for (const auto &context : _responses)
     {
-        const auto savedInput = savedContext.find(context);
-        if (savedInput != savedContext.end())
+        const auto input = _sensors.find(context.first);
+        if (input != _sensors.end())
         {
-            _sensors[context] = savedInput->second;
+            _sensors[context.first] = input->second;
         }
         else
         {
-            _sensors.insert(std::make_pair(context, NeuralNode(context)));
+            _sensors.insert(context);
         }
     }
 
@@ -154,12 +187,12 @@ void flux::CortexBlackBox::Step()
     auto contextTarget = _cortexDecisionLayer.GetCurrentTransition().GetDesiredContext();
 
     //apply desired context target
-    for (auto &contextInput : _contextInputIds)
+    for (auto &contextOutput : _responses)
     {
-        const auto input = contextTarget.find(contextInput);
+        const auto input = contextTarget.find(contextOutput.first);
         if (input != contextTarget.end())
         {
-            _sensors[contextInput] = input->second;
+            _sensors[contextOutput.first] = input->second;
         }
     }
 
@@ -196,11 +229,6 @@ void flux::CortexBlackBox::Step()
     }
 
     std::vector<NeuralNode> outputs = activityUnit->Activate(preInputs);
-    for (const auto &output : _outputs)
-    {
-        output->Apply(outputs);
-    }
-
     for (auto &output : _responses)
     {
         output.second.Reset();
@@ -215,6 +243,11 @@ void flux::CortexBlackBox::Step()
         {
             _responses[outputValue.GetNodeId()].Apply(outputValue.GetValue());
         }
+    }
+
+    for (const auto &output : _outputs)
+    {
+        output->Apply(_responses);
     }
 }
 
@@ -365,11 +398,6 @@ void flux::CortexBlackBox::FetchFeedback(const std::map<NeuralNodeId, NeuralNode
 void flux::CortexBlackBox::AddBuiltinTransition(const flux::CortexTransition &transition)
 {
     _cortexDecisionLayer.AddBuiltinTransition(transition);
-}
-
-void flux::CortexBlackBox::AddContextInput(flux::NeuralNodeId id)
-{
-    _contextInputIds.push_back(id);
 }
 
 void flux::CortexBlackBox::SetActivityBound(std::string activityId)

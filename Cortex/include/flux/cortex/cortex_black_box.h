@@ -35,7 +35,6 @@ namespace flux {
         void AddFeedback(std::shared_ptr<IFeedbackUnit> feedback);
         void AddOutput(std::shared_ptr<IOutputUnit> output) override;
         void AddBuiltinTransition(const CortexTransition &transition);
-        void AddContextInput(NeuralNodeId id);
 
         const NeuralNode &GetInputOf(std::string id) const override;
         const NeuralNode &GetOutputOf(std::string id) const override;
@@ -52,7 +51,6 @@ namespace flux {
         void UpdateChildScheme(std::string childId, std::istream &istream) override;
 
     private:
-        std::vector<NeuralNodeId> _contextInputIds;
         std::vector<std::shared_ptr<IRawSensorUnit>> _rawInputs;
         std::vector<std::shared_ptr<IAugmentedSensorUnit>> _augmentedInputs;
         std::vector<std::shared_ptr<IOutputUnit>> _outputs;

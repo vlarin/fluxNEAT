@@ -90,11 +90,8 @@ int main()
     auto context = std::make_shared<XorContext>(manualInput);
     std::shared_ptr<CortexBlackBox> blackBox = std::make_shared<CortexBlackBox>("test", context);
     blackBox->AddRawInput(std::static_pointer_cast<IRawSensorUnit>(manualInput->Clone(context)));
-    blackBox->AddContextInput(inputC);
 
-    NeuralNodeId outputId("xor_value");
-    set<NeuralNodeId> outputIds = { outputId };
-    auto activity = std::make_shared<IdentityActivityUnit>(inputC, outputId, "manipulator", context);
+    auto activity = std::make_shared<IdentityActivityUnit>(inputC, inputC, "manipulator", context);
 
     blackBox->AddActivity(activity);
 

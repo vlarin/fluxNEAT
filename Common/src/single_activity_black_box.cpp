@@ -104,10 +104,6 @@ void flux::SingleActivityBlackBox::Step()
     }
 
     std::vector<NeuralNode> outputs = _activityUnit->Activate(preInputs);
-    for (const auto &output : _outputs)
-    {
-        output->Apply(outputs);
-    }
 
     for (auto &output : _responses)
     {
@@ -123,6 +119,11 @@ void flux::SingleActivityBlackBox::Step()
 		{
 			_responses[outputValue.GetNodeId()].Apply(outputValue.GetValue());
 		}
+    }
+
+    for (const auto &output : _outputs)
+    {
+        output->Apply(_responses);
     }
 }
 
