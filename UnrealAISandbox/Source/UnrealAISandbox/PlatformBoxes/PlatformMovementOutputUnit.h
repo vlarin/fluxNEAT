@@ -18,7 +18,18 @@ class PlatformMovementOutputUnit : public flux::IOutputUnit
 public:
 	PlatformMovementOutputUnit(const std::string& id, const std::shared_ptr<flux::IContext>& context);
 
-	void Apply(const std::vector<flux::NeuralNode>& outputs) const override;
+    std::set<flux::NeuralNodeId> GetOutputIds() const override
+    {
+        return std::set<flux::NeuralNodeId>
+        {
+            BoxHUpId,
+            BoxHDownId,
+            BoxVUpId,
+            BoxVDownId
+        };
+    };
+    
+	void Apply(const std::map<flux::NeuralNodeId, flux::NeuralNode> &outputs) const override;
 
 	std::shared_ptr<IContextUnit> Clone(std::shared_ptr<flux::IContext> context) const override;
 };

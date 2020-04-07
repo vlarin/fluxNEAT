@@ -18,10 +18,10 @@ const std::set<NeuralNodeId> GOutputIds{ BoxHUpId, BoxHDownId, BoxVUpId, BoxVDow
 PlatformMovementOutputUnit::PlatformMovementOutputUnit(const std::string& id, const std::shared_ptr<flux::IContext>& context)
 	: IOutputUnit(id, context) {}
 
-void PlatformMovementOutputUnit::Apply(const std::vector<flux::NeuralNode>& outputs) const
+void PlatformMovementOutputUnit::Apply(const std::map<flux::NeuralNodeId, flux::NeuralNode> &outputs) const
 {
-	float dx = outputs[0].GetValue() - outputs[1].GetValue();
-	float dy = outputs[2].GetValue() - outputs[3].GetValue();
+    float dx = outputs.find(BoxHUpId)->second.GetValue() - outputs.find(BoxHDownId)->second.GetValue();
+	float dy = outputs.find(BoxVUpId)->second.GetValue() - outputs.find(BoxVDownId)->second.GetValue();
 
 	std::static_pointer_cast<PlatformBoxesContext>(GetContext())->Sandbox().ApplyPlatformMovement(dx, dy);
 }

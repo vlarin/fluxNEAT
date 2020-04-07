@@ -33,14 +33,16 @@ public:
 	DebugOutputUnit(const string &id, const shared_ptr<IContext> &context) : IEvaluationOutputUnit(id, context),
 		_evalutionCount(0), _error(0) {}
 
-	void Apply(const std::vector<flux::NeuralNode> &outputs) const override
+    std::set<NeuralNodeId> GetOutputIds() const override { return std::set<NeuralNodeId> { NeuralNodeId("xor_value") }; };
+
+	void Apply(const std::map<flux::NeuralNodeId, flux::NeuralNode> &outputs) const override
 	{
 		auto world = std::static_pointer_cast<XorContext>(GetContext())->GetWorldInputs();
 		float_fl answer = (world[0].GetValue() + world[1].GetValue()) * (!world[0].GetValue() + !world[1].GetValue());
 
 		for (const auto &output : outputs)
 		{
-			_error += std::pow(answer - output.GetValue(), 2);
+            _error += std::pow(answer - output.second.GetValue(), 2);
 		}
 
 		++_evalutionCount;
