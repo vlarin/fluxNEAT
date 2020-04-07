@@ -25,8 +25,8 @@ namespace flux {
         void AddActivity(std::shared_ptr<IActivityUnit> activity) override;
         void AddOutput(std::shared_ptr<IOutputUnit> output) override;
 
-        const NeuralInput &GetInputOf(std::string id) const override;
-        const NeuralOutput &GetOutputOf(std::string id) const override;
+        const NeuralNode &GetInputOf(std::string id) const override;
+        const NeuralNode &GetOutputOf(std::string id) const override;
 
         void Step() override;
 
@@ -40,8 +40,8 @@ namespace flux {
 
         std::shared_ptr<IActivityUnit> _activityUnit;
 
-        std::map<NeuralInputId, NeuralInput> _sensors;
-        std::map<NeuralOutputId, NeuralOutput> _responses;
+        std::map<NeuralNodeId, NeuralNode> _sensors;
+        std::map<NeuralNodeId, NeuralNode> _responses;
     };
 }
 

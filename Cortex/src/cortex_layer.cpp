@@ -1,7 +1,7 @@
 #include <flux/cortex/cortex_layer.h>
 #include <algorithm>
 
-const flux::CortexColumn &flux::CortexLayer::GrowOrMerge(const std::map<NeuralInputId, NeuralInput> &context,
+const flux::CortexColumn &flux::CortexLayer::GrowOrMerge(const std::map<NeuralNodeId, NeuralNode> &context,
                                                          const std::map<MediatorId, MediatorValue> &mediators)
 {
     for (auto &column : _columns)
@@ -21,7 +21,7 @@ const std::vector<flux::CortexColumn> &flux::CortexLayer::GetExcitedColumns() co
     return _columns;
 }
 
-void flux::CortexLayer::Step(const std::map<NeuralInputId, NeuralInput> &context,
+void flux::CortexLayer::Step(const std::map<NeuralNodeId, NeuralNode> &context,
                              const std::map<MediatorId, MediatorValue> &mediators)
 {
     for (auto &column : _columns)

@@ -17,7 +17,7 @@ const flux::CortexTargetedTransition &flux::CortexDecisionLayer::GetCurrentTrans
     return _currentTransition;
 }
 
-void flux::CortexDecisionLayer::Step(const std::map<NeuralInputId, NeuralInput> &context,
+void flux::CortexDecisionLayer::Step(const std::map<NeuralNodeId, NeuralNode> &context,
                                      const std::map<MediatorId, MediatorValue> &mediators)
 {
     _currentTransitionLifetime++;
@@ -34,8 +34,8 @@ void flux::CortexDecisionLayer::ResetActivityBound()
     _activityBound = "";
 }
 
-bool flux::CortexDecisionLayer::TryMakeDecision(const std::map<NeuralInputId, NeuralInput> &context,
-                                                const std::map<NeuralInputId, NeuralInput> &desiredContext,
+bool flux::CortexDecisionLayer::TryMakeDecision(const std::map<NeuralNodeId, NeuralNode> &context,
+                                                const std::map<NeuralNodeId, NeuralNode> &desiredContext,
                                                 const std::map<MediatorId, MediatorValue> &mediators)
 {
     //TODO: add inertia, transitions multi-dim cashing
@@ -54,7 +54,7 @@ bool flux::CortexDecisionLayer::TryMakeDecision(const std::map<NeuralInputId, Ne
     return false;
 }
 
-void flux::CortexDecisionLayer::StartWandering(const std::map<NeuralInputId, NeuralInput> &context,
+void flux::CortexDecisionLayer::StartWandering(const std::map<NeuralNodeId, NeuralNode> &context,
                                                const std::map<MediatorId, MediatorValue> &mediators)
 {
     //TODO: add inertia, transitions multi-dim cashing, handle no available transitions case
@@ -65,7 +65,7 @@ void flux::CortexDecisionLayer::StartWandering(const std::map<NeuralInputId, Neu
             _currentTransition = transition.CreateWanderingInstance(context);
             _currentTransitionLifetime = 0;
             _isWandering = true;
-            std::cout << "Wandering to " << _currentTransition.GetDesiredContext().find(NeuralInputId("c"))->second.GetValue() << std::endl;
+            std::cout << "Wandering to " << _currentTransition.GetDesiredContext().find(NeuralNodeId("c"))->second.GetValue() << std::endl;
         }
     }
 }

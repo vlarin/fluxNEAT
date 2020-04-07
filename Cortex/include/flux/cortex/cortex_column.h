@@ -6,7 +6,7 @@
 #define FLUXNEAT_CORTEX_COLUMN_H
 
 #include <flux/prereq.h>
-#include <flux/neural_input.h>
+#include <flux/neural_node.h>
 #include <flux/feedback/mediator_value.h>
 #include <flux/cortex/cortex_transition.h>
 
@@ -22,12 +22,12 @@ namespace flux
     public:
         explicit CortexColumn(
                 size_t id,
-                const std::map<NeuralInputId, NeuralInput> &immediateContext,
+                const std::map<NeuralNodeId, NeuralNode> &immediateContext,
                 std::map<MediatorId, MediatorValue> mediators);
 
         inline size_t GetId() const { return _id; }
         inline float_fl GetExcitementLevel() const { return _excitementLevel; }
-        inline const std::map<NeuralInputId, NeuralInput> &GetContext() const { return _pivot; }
+        inline const std::map<NeuralNodeId, NeuralNode> &GetContext() const { return _pivot; }
 
         /**
          * Try to merge new captured feedback state into this column. This method will try to expand trusted intervals
@@ -38,10 +38,10 @@ namespace flux
          * @return true, if merge went successful, false otherwise
          */
         bool TryMerge(
-                const std::map<NeuralInputId, NeuralInput> &context,
+                const std::map<NeuralNodeId, NeuralNode> &context,
                 const std::map<MediatorId, MediatorValue> &mediators);
 
-        void Step(const std::map<NeuralInputId, NeuralInput> &context,
+        void Step(const std::map<NeuralNodeId, NeuralNode> &context,
                   const std::map<MediatorId, MediatorValue> &mediators);
 
         bool operator <(const CortexColumn &other) const;
@@ -53,10 +53,10 @@ namespace flux
         // described with a pivot (initial point), current centroid and radius.
         // Represents approximated group of neurons that constraint part of convex feature space
         //TODO: consider using low level vertex math from armadillo
-        std::map<NeuralInputId, NeuralInput> _pivot;
-        std::map<NeuralInputId, NeuralInput> _centroid;
-        std::map<NeuralInputId, NeuralInput> _limitUpper;
-        std::map<NeuralInputId, NeuralInput> _limitLower;
+        std::map<NeuralNodeId, NeuralNode> _pivot;
+        std::map<NeuralNodeId, NeuralNode> _centroid;
+        std::map<NeuralNodeId, NeuralNode> _limitUpper;
+        std::map<NeuralNodeId, NeuralNode> _limitLower;
         float_fl _radius;
 
         std::map<MediatorId, MediatorValue> _mediatorsAverages;
@@ -65,7 +65,7 @@ namespace flux
 
         // Computes activation value of the column, it ranges from 1 inside a hypersphere and
         // then linearly drops to 0.1 at X% of outside radius continuing with more prolonged linear drop to zero at 10 units
-        float_fl CalculateActivationValue(const std::map<NeuralInputId, NeuralInput> &context);
+        float_fl CalculateActivationValue(const std::map<NeuralNodeId, NeuralNode> &context);
     };
 }
 

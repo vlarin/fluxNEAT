@@ -6,8 +6,7 @@
 #define FLUXNEAT_COMMON_H
 
 #include <flux/prereq.h>
-#include <flux/neural_input.h>
-#include <flux/neural_output.h>
+#include <flux/neural_node.h>
 
 #include <flux/context_registry.h>
 #include <flux/raw_sensor_unit.h>

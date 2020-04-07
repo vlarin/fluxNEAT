@@ -10,23 +10,23 @@
 
 using namespace flux;
 
-const NeuralInputId BoxHId("BoxH");
-const NeuralInputId BoxVId("BoxV");
-const NeuralInputId SpeedHId("SpeedH");
-const NeuralInputId SpeedVId("SpeedV");
-const NeuralInputId DistId("Dist");
+const NeuralNodeId BoxHId("BoxH");
+const NeuralNodeId BoxVId("BoxV");
+const NeuralNodeId SpeedHId("SpeedH");
+const NeuralNodeId SpeedVId("SpeedV");
+const NeuralNodeId DistId("Dist");
 
-const std::set<NeuralInputId> GInputIds { BoxHId, BoxVId, SpeedHId, SpeedVId, DistId };
+const std::set<NeuralNodeId> GInputIds { BoxHId, BoxVId, SpeedHId, SpeedVId, DistId };
 
 PlatformInputSensorUnit::PlatformInputSensorUnit(const std::string& id, const std::shared_ptr<flux::IContext>& context)
 	: IRawSensorUnit(id, context) {}
 
-std::set<NeuralInputId> PlatformInputSensorUnit::GetInputIds() const
+std::set<NeuralNodeId> PlatformInputSensorUnit::GetInputIds() const
 {
 	return GInputIds;
 }
 
-std::vector<NeuralInput> PlatformInputSensorUnit::Fetch() const
+std::vector<NeuralNode> PlatformInputSensorUnit::Fetch() const
 {
 	auto environment = std::static_pointer_cast<PlatformBoxesContext>(GetContext());
 	auto target = environment->Sandbox().GetFallingCubeLocation();
@@ -55,12 +55,12 @@ std::vector<NeuralInput> PlatformInputSensorUnit::Fetch() const
 	auto boxH = FMath::Clamp<float>(dir.X, -5, 5);
 	auto boxV = FMath::Clamp<float>(dir.Y, -5, 5);
 	
-	return std::vector<NeuralInput> {
-		NeuralInput(BoxHId, boxH),
-		NeuralInput(BoxVId, boxV),
-		NeuralInput(SpeedHId, speed.X / 100.0),
-		NeuralInput(SpeedVId, speed.Y / 100.0),
-		NeuralInput(DistId, dist)
+	return std::vector<NeuralNode> {
+		NeuralNode(BoxHId, boxH),
+		NeuralNode(BoxVId, boxV),
+		NeuralNode(SpeedHId, speed.X / 100.0),
+		NeuralNode(SpeedVId, speed.Y / 100.0),
+		NeuralNode(DistId, dist)
 	};
 }
 

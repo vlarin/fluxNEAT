@@ -17,17 +17,17 @@ namespace flux
     class FLUX_API IdentityActivityUnit : public IActivityUnit
     {
     public:
-        IdentityActivityUnit(NeuralInputId target, NeuralOutputId outputId, std::string id, std::shared_ptr<IContext> context);
+        IdentityActivityUnit(NeuralNodeId target, NeuralNodeId outputId, std::string id, std::shared_ptr<IContext> context);
 
-        std::set<NeuralInputId> GetInputIds() const override ;
-        std::set<NeuralOutputId> GetOutputIds() const override ;
+        std::set<NeuralNodeId> GetInputIds() const override ;
+        std::set<NeuralNodeId> GetOutputIds() const override ;
 
-        std::vector<NeuralOutput> Activate(const std::vector<NeuralInput> &inputs) const override ;
+        std::vector<NeuralNode> Activate(const std::vector<NeuralNode> &inputs) const override ;
 
         std::shared_ptr<IContextUnit> Clone(std::shared_ptr<IContext> context) const override;
     private:
-        NeuralInputId _target;
-        NeuralOutputId _outputId;
+        NeuralNodeId _target;
+        NeuralNodeId _outputId;
     };
 }
 

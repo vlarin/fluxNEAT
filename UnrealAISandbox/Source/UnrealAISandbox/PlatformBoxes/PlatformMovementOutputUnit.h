@@ -6,19 +6,19 @@
 
 #include <flux/common.h>
 
-extern const flux::NeuralOutputId BoxHUpId;
-extern const flux::NeuralOutputId BoxHDownId;
-extern const flux::NeuralOutputId BoxVUpId;
-extern const flux::NeuralOutputId BoxVDownId;
+extern const flux::NeuralNodeId BoxHUpId;
+extern const flux::NeuralNodeId BoxHDownId;
+extern const flux::NeuralNodeId BoxVUpId;
+extern const flux::NeuralNodeId BoxVDownId;
 
-extern const std::set<flux::NeuralOutputId> GOutputIds;
+extern const std::set<flux::NeuralNodeId> GOutputIds;
 
 class PlatformMovementOutputUnit : public flux::IOutputUnit
 {
 public:
 	PlatformMovementOutputUnit(const std::string& id, const std::shared_ptr<flux::IContext>& context);
 
-	void Apply(const std::vector<flux::NeuralOutput>& outputs) const override;
+	void Apply(const std::vector<flux::NeuralNode>& outputs) const override;
 
 	std::shared_ptr<IContextUnit> Clone(std::shared_ptr<flux::IContext> context) const override;
 };

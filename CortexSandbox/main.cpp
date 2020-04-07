@@ -21,7 +21,7 @@ public:
         _inputStub.IsAutoPlayed() = false;
    }
 
-    std::vector<NeuralInput> getWorldInputs() { return  _inputStub.Fetch(); }
+    std::vector<NeuralNode> getWorldInputs() { return  _inputStub.Fetch(); }
     void Step() { _inputStub.Step(); }
 private:
     ManualRawInputSensor _inputStub;
@@ -30,16 +30,16 @@ private:
 class XorFeedbackUnit : public IFeedbackUnit
 {
 public:
-    explicit XorFeedbackUnit(NeuralInputId contextId, MediatorId mediatorId,
+    explicit XorFeedbackUnit(NeuralNodeId contextId, MediatorId mediatorId,
             const string &id, const shared_ptr<IContext> &context) : IFeedbackUnit(id, context),
             _targetContextId(std::move(contextId)), _mediatorId(std::move(mediatorId)) {}
 
-    std::set<NeuralInputId> GetInputIds() const override
+    std::set<NeuralNodeId> GetInputIds() const override
     {
-        return std::set<NeuralInputId> { _targetContextId };
+        return std::set<NeuralNodeId> { _targetContextId };
     }
 
-    vector<MediatorValue> Activate(const std::vector<NeuralInput> &inputs) const override
+    vector<MediatorValue> Activate(const std::vector<NeuralNode> &inputs) const override
     {
         auto world = std::static_pointer_cast<XorContext>(GetContext())->getWorldInputs();
         float_fl answer = (world[0].GetValue() + world[1].GetValue()) * (!world[0].GetValue() + !world[1].GetValue());
@@ -48,10 +48,10 @@ public:
         //cout << "Black box activation result:" << endl;
         for (const auto &input : inputs)
         {
-            if (input.GetInputId().GetId() == _targetContextId.GetId())
+            if (input.GetNodeId().GetId() == _targetContextId.GetId())
             {
                 error += std::pow(answer - input.GetValue(), 2);
-                //cout << input.GetOutputId().GetId() << ": Expected [" << answer << "] Actual [" << input.GetValue() << "]" << endl;
+                //cout << input.GetId().GetNodeId() << ": Expected [" << answer << "] Actual [" << input.GetValue() << "]" << endl;
             }
         }
         return std::vector<MediatorValue> { MediatorValue(_mediatorId, 1 - sqrt(error))};
@@ -64,7 +64,7 @@ public:
 
 private:
     MediatorId _mediatorId;
-    NeuralInputId _targetContextId;
+    NeuralNodeId _targetContextId;
 };
 
 int main()
@@ -72,19 +72,19 @@ int main()
     cout << "Starting cortex XOR black box test..." << endl;
     auto emptyContext = std::make_shared<UnitContext>("Empty Context");
 
-    NeuralInputId inputA("a");
-    NeuralInputId inputB("b");
-    NeuralInputId inputC("c");
-    set<NeuralInputId> rawInputIds = {inputA, inputB};
-    set<NeuralInputId> inputIds = {inputA, inputB, inputC};
+    NeuralNodeId inputA("a");
+    NeuralNodeId inputB("b");
+    NeuralNodeId inputC("c");
+    set<NeuralNodeId> rawInputIds = {inputA, inputB};
+    set<NeuralNodeId> inputIds = {inputA, inputB, inputC};
     auto manualInput = std::make_shared<ManualRawInputSensor>("xor_emu", emptyContext, rawInputIds, false);
 
-    manualInput->SetInputsSequence( vector<vector<NeuralInput>>
+    manualInput->SetInputsSequence( vector<vector<NeuralNode>>
                                             {
-                                                    (vector<NeuralInput> { NeuralInput(inputA, 0), NeuralInput(inputB, 0) }),
-                                                    (vector<NeuralInput> { NeuralInput(inputA, 1), NeuralInput(inputB, 0) }),
-                                                    (vector<NeuralInput> { NeuralInput(inputA, 0), NeuralInput(inputB, 1) }),
-                                                    (vector<NeuralInput> { NeuralInput(inputA, 1), NeuralInput(inputB, 1) })
+                                                    (vector<NeuralNode> { NeuralNode(inputA, 0), NeuralNode(inputB, 0) }),
+                                                    (vector<NeuralNode> { NeuralNode(inputA, 1), NeuralNode(inputB, 0) }),
+                                                    (vector<NeuralNode> { NeuralNode(inputA, 0), NeuralNode(inputB, 1) }),
+                                                    (vector<NeuralNode> { NeuralNode(inputA, 1), NeuralNode(inputB, 1) })
                                             });
 
     auto context = std::make_shared<XorContext>(manualInput);
@@ -92,8 +92,8 @@ int main()
     blackBox->AddRawInput(std::static_pointer_cast<IRawSensorUnit>(manualInput->Clone(context)));
     blackBox->AddContextInput(inputC);
 
-    NeuralOutputId outputId("xor_value");
-    set<NeuralOutputId> outputIds = { outputId };
+    NeuralNodeId outputId("xor_value");
+    set<NeuralNodeId> outputIds = { outputId };
     auto activity = std::make_shared<IdentityActivityUnit>(inputC, outputId, "manipulator", context);
 
     blackBox->AddActivity(activity);
@@ -104,10 +104,10 @@ int main()
     blackBox->AddFeedback(feedback);
 
     CortexTransition identityTransition("identity", "manipulator",
-            std::map<NeuralInputId, NeuralInput> { { inputC, NeuralInput(inputC, 0.5)}},
-            std::map<NeuralInputId, float_fl> { { inputC, 0.5}},
-            std::map<NeuralInputId, NeuralInput> { { inputC, NeuralInput(inputC, 0.5)}},
-            std::map<NeuralInputId, float_fl> { { inputC, 0.5}},
+            std::map<NeuralNodeId, NeuralNode> { { inputC, NeuralNode(inputC, 0.5)}},
+            std::map<NeuralNodeId, float_fl> { { inputC, 0.5}},
+            std::map<NeuralNodeId, NeuralNode> { { inputC, NeuralNode(inputC, 0.5)}},
+            std::map<NeuralNodeId, float_fl> { { inputC, 0.5}},
             std::map<MediatorId, MediatorValue>() );
 
     blackBox->AddBuiltinTransition(identityTransition);

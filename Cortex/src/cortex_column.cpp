@@ -21,7 +21,7 @@ static flux::float_fl CalculateMediationSqrDifference(const std::vector<flux::Me
 }
 
 flux::CortexColumn::CortexColumn(size_t id,
-                                 const std::map<NeuralInputId, NeuralInput> &immediateContext,
+                                 const std::map<NeuralNodeId, NeuralNode> &immediateContext,
                                  std::map<MediatorId, MediatorValue> mediators)
                                  : _id (id), _mediatorsAverages(std::move(mediators)),
                                  _excitementLevel(0.0),
@@ -29,7 +29,7 @@ flux::CortexColumn::CortexColumn(size_t id,
                                  _centroid(immediateContext),
                                  _radius(STANDARD_RADIUS) {}
 
-bool flux::CortexColumn::TryMerge(const std::map<NeuralInputId, NeuralInput> &context,
+bool flux::CortexColumn::TryMerge(const std::map<NeuralNodeId, NeuralNode> &context,
                                   const std::map<MediatorId, MediatorValue> &mediators)
 {
     std::vector<MediatorValue> averages;
@@ -60,12 +60,12 @@ bool flux::CortexColumn::TryMerge(const std::map<NeuralInputId, NeuralInput> &co
     if (activationValue < 1 && isMediationFitting)
     {
         //activation is not fit while mediators are ok try to make greedy extension
-        std::map<NeuralInputId, NeuralInput> newCentroid;
+        std::map<NeuralNodeId, NeuralNode> newCentroid;
         float_fl newRadius = 0;
         for (const auto &inputKey : context)
         {
             newCentroid.insert(std::make_pair(inputKey.first,
-                    NeuralInput(inputKey.first, (_centroid[inputKey.first].GetValue() + inputKey.second.GetValue()) / 2.0)));
+                    NeuralNode(inputKey.first, (_centroid[inputKey.first].GetValue() + inputKey.second.GetValue()) / 2.0)));
             float_fl delta = abs(_centroid[inputKey.first].GetValue() - inputKey.second.GetValue());
             newRadius += delta * delta;
         }
@@ -157,7 +157,7 @@ bool flux::CortexColumn::TryMerge(const std::map<NeuralInputId, NeuralInput> &co
     return false;
 }
 
-void flux::CortexColumn::Step(const std::map<NeuralInputId, NeuralInput> &context,
+void flux::CortexColumn::Step(const std::map<NeuralNodeId, NeuralNode> &context,
                               const std::map<MediatorId, MediatorValue> &mediators)
 {
     TryMerge(context, mediators);
@@ -180,7 +180,7 @@ bool flux::CortexColumn::operator >(const flux::CortexColumn &other) const
     return _excitementLevel > other._excitementLevel;
 }
 
-flux::float_fl flux::CortexColumn::CalculateActivationValue(const std::map<NeuralInputId, NeuralInput> &context)
+flux::float_fl flux::CortexColumn::CalculateActivationValue(const std::map<NeuralNodeId, NeuralNode> &context)
 {
     float_fl activationValue = 0;
     float_fl radiusSquared = _radius * _radius;

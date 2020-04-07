@@ -6,7 +6,7 @@
 #define FLUXNEAT_CORTEX_TARGETED_TRANSITION_H
 
 #include <flux/prereq.h>
-#include <flux/neural_input.h>
+#include <flux/neural_node.h>
 #include <flux/feedback/mediator_value.h>
 
 namespace flux
@@ -20,20 +20,20 @@ namespace flux
     public:
         explicit CortexTargetedTransition(std::string id,
                                   std::string activityId,
-                                  std::map<NeuralInputId, NeuralInput> initialSequence,
-                                  std::map<NeuralInputId, NeuralInput> desiredSequence);
+                                  std::map<NeuralNodeId, NeuralNode> initialSequence,
+                                  std::map<NeuralNodeId, NeuralNode> desiredSequence);
         explicit CortexTargetedTransition();
 
         inline std::string GetId() const { return _id; }
         inline std::string GetActivityId() const { return _activityId; }
-        inline const std::map<NeuralInputId, NeuralInput> &GetInitialContext() const { return _initialSequence; }
-        inline const std::map<NeuralInputId, NeuralInput> &GetDesiredContext() const { return _expectedSequence; }
+        inline const std::map<NeuralNodeId, NeuralNode> &GetInitialContext() const { return _initialSequence; }
+        inline const std::map<NeuralNodeId, NeuralNode> &GetDesiredContext() const { return _expectedSequence; }
 
     private:
         std::string _id;
         std::string _activityId;
-        std::map<NeuralInputId, NeuralInput> _initialSequence;
-        std::map<NeuralInputId, NeuralInput> _expectedSequence;
+        std::map<NeuralNodeId, NeuralNode> _initialSequence;
+        std::map<NeuralNodeId, NeuralNode> _expectedSequence;
     };
 }
 

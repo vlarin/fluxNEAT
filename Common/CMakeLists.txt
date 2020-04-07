@@ -12,8 +12,7 @@ generate_product_version(fluxNeat-Common-ProductVersionFiles
 
 add_library(fluxNEAT.Common
         include/flux/common.h
-        src/neural_input.cpp
-        src/neural_output.cpp
+        src/neural_node.cpp
         src/mediator_value.cpp
         src/context_unit.cpp
         src/manual_raw_input.cpp
@@ -28,6 +27,7 @@ add_library(fluxNEAT.Common
 
         ${fluxNeat-Common-ProductVersionFiles}
 
+        include/flux/neural_node.h
         include/flux/black_box.h
         include/flux/context_unit.h
         include/flux/output_unit.h

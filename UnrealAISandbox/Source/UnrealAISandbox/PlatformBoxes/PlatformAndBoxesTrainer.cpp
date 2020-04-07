@@ -25,7 +25,7 @@ public:
 	FallingBoxesEvaluationUnit(const string &id, const shared_ptr<PlatformBoxesContext> &context) : IEvaluationOutputUnit(id, context)
 	{}
 
-	void Apply(const std::vector<flux::NeuralOutput> &outputs) const override
+	void Apply(const std::vector<flux::NeuralNode> &outputs) const override
 	{
 	}
 

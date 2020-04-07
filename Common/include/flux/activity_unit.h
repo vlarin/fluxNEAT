@@ -8,8 +8,7 @@
 #include <set>
 
 #include <flux/prereq.h>
-#include <flux/neural_input.h>
-#include <flux/neural_output.h>
+#include <flux/neural_node.h>
 #include <flux/context_unit.h>
 
 namespace flux {
@@ -22,10 +21,10 @@ namespace flux {
     protected:
         IActivityUnit(std::string id, std::shared_ptr<IContext> context) : IContextUnit(std::move(id), std::move(context)) {}
     public:
-        virtual std::set<NeuralInputId> GetInputIds() const = 0;
-        virtual std::set<NeuralOutputId> GetOutputIds() const = 0;
+        virtual std::set<NeuralNodeId> GetInputIds() const = 0;
+        virtual std::set<NeuralNodeId> GetOutputIds() const = 0;
 
-        virtual std::vector<NeuralOutput> Activate(const std::vector<NeuralInput> &inputs) const = 0;
+        virtual std::vector<NeuralNode> Activate(const std::vector<NeuralNode> &inputs) const = 0;
     };
 }
 
