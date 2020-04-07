@@ -29,6 +29,6 @@ void flux::CortexLayer::Step(const std::map<NeuralInputId, NeuralInput> &context
         column.Step(context, mediators);
     }
 
-    //Update excitement priorities
+    //Update excitement priorities: TODO: Only in neighbouring metric, neighbouring slices
     std::sort(_columns.begin(), _columns.end(), std::greater<CortexColumn>());
 }

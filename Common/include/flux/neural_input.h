@@ -20,6 +20,9 @@ namespace flux {
         std::string GetId() const { return id; }
 
         bool operator <(const NeuralInputId &other) const { return id < other.id; }
+
+        bool operator ==(const NeuralInputId &other) const { return id == other.id; }
+        bool operator !=(const NeuralInputId &other) const { return id != other.id; }
     };
 
     class FLUX_API NeuralInput
