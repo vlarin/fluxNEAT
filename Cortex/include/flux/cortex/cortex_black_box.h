@@ -27,7 +27,7 @@ namespace flux {
     class FLUX_API CortexBlackBox : public IBlackBox
     {
     public:
-        CortexBlackBox(const std::string &id, std::shared_ptr<IContext> context);
+        CortexBlackBox(float_fl mediatorThreshold, const std::string &id, std::shared_ptr<IContext> context);
 
         void AddRawInput(std::shared_ptr<IRawSensorUnit> input) override;
         void AddAugmentedInput(std::shared_ptr<IAugmentedSensorUnit> input) override;
@@ -36,6 +36,7 @@ namespace flux {
         void AddOutput(std::shared_ptr<IOutputUnit> output) override;
         void AddBuiltinTransition(const CortexTransition &transition);
 
+        inline float_fl GetMediatorThreshold() const { return _mediatorThreshold; }
         const NeuralNode &GetInputOf(std::string id) const override;
         const NeuralNode &GetOutputOf(std::string id) const override;
         const MediatorValue &GetMediatorOf(std::string id) const;
@@ -61,6 +62,9 @@ namespace flux {
         std::map<NeuralNodeId, NeuralNode> _sensors;
         std::map<NeuralNodeId, NeuralNode> _responses;
         std::map<MediatorId, MediatorValue> _mediators;
+
+        //XXX: temp TODO: make dynamic mediator exploration with the help of Excitement-Novelty mediator and Wandering state
+        float_fl _mediatorThreshold;
 
         CortexLayer _cortexLayer;
         CortexDecisionLayer _cortexDecisionLayer;

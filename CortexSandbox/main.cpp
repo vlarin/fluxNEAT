@@ -88,7 +88,7 @@ int main()
                                             });
 
     auto context = std::make_shared<XorContext>(manualInput);
-    std::shared_ptr<CortexBlackBox> blackBox = std::make_shared<CortexBlackBox>("test", context);
+    std::shared_ptr<CortexBlackBox> blackBox = std::make_shared<CortexBlackBox>(0.95, "test", context);
     blackBox->AddRawInput(std::static_pointer_cast<IRawSensorUnit>(manualInput->Clone(context)));
 
     auto activity = std::make_shared<IdentityActivityUnit>(inputC, inputC, "manipulator", context);
@@ -114,7 +114,7 @@ int main()
     {
         context->Step();
         blackBox->Step();
-        if ( blackBox->GetMediatorOf("xor").GetValue() < 0.98)
+        if ( blackBox->GetMediatorOf("xor").GetValue() < blackBox->GetMediatorThreshold())
         {
             lastXorUnfulfill = i;
         }

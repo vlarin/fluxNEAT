@@ -2,8 +2,8 @@
 
 static bool UpdateChildSchemeImpl(const std::string& childId, std::istream &istream, flux::IContextUnit &input);
 
-flux::CortexBlackBox::CortexBlackBox(const std::string &id, std::shared_ptr<IContext> context)
-   : IBlackBox(id, std::move(context)) {}
+flux::CortexBlackBox::CortexBlackBox(float_fl mediatorThreshold, const std::string &id, std::shared_ptr<IContext> context)
+   : IBlackBox(id, std::move(context)), _mediatorThreshold(mediatorThreshold) {}
 
 void flux::CortexBlackBox::AddRawInput(std::shared_ptr<IRawSensorUnit> input)
 {
@@ -162,7 +162,7 @@ void flux::CortexBlackBox::Step()
         }
     }
 
-    if (maxMediator > 0.98)
+    if (maxMediator > _mediatorThreshold)
     {
         _cortexLayer.GrowOrMerge(_sensors, _mediators);
     }
@@ -207,7 +207,7 @@ void flux::CortexBlackBox::Step()
         }
     }
 
-    if (maxMediator > 0.98)
+    if (maxMediator > _mediatorThreshold)
     {
         _cortexLayer.GrowOrMerge(_sensors, _mediators);
     }
