@@ -66,7 +66,7 @@ public:
 		}
 	}
 
-	shared_ptr<IContext> RetrieveContext() override
+	shared_ptr<IContext> RetrieveContext(bool isInPreviewMode) override
 	{
 		UWorld* world = _trainer->GetWorld();
 		APlatformAndBoxesSandbox* sandbox = nullptr;
@@ -104,6 +104,7 @@ public:
 		sandbox->Destroy();
 		_indexes.Add(platformContext.GetIndex());
 	}
+    void ForceReleaseAll() override {}
 
 	~ContextRegistry() = default;
 

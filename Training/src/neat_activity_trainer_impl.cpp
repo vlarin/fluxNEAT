@@ -178,7 +178,7 @@ void flux::NeatActivityTrainer::NeatActivityTrainerImpl::EndEpoch()
 
 void flux::NeatActivityTrainer::NeatActivityTrainerImpl::EmplaceForEvaluation(EvaluationEntry entry)
 {
-    std::shared_ptr<IContext> slot = _trainingPool->RetrieveContext();
+    std::shared_ptr<IContext> slot = _trainingPool->RetrieveContext(false);
     entry.FitnessEvaluatorUnit = std::static_pointer_cast<IEvaluationOutputUnit>(_trainingFitnessUnitProto->Clone(slot));
     entry.Entity = std::static_pointer_cast<IBlackBox>(_trainingProto->Clone(slot));
     entry.Entity->AddOutput(entry.FitnessEvaluatorUnit);

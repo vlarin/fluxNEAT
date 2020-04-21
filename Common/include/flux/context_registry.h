@@ -12,8 +12,9 @@ namespace flux {
     class FLUX_API IContextRegistry
     {
     public:
-        virtual std::shared_ptr<IContext> RetrieveContext() = 0;
+        virtual std::shared_ptr<IContext> RetrieveContext(bool isInPreviewMode) = 0;
         virtual void ReleaseContext(const IContext &context) = 0;
+        virtual void ForceReleaseAll() = 0;
     };
 }
 

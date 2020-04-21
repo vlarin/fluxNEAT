@@ -79,12 +79,13 @@ class ContextRegistry : public IContextRegistry
 public:
 	explicit ContextRegistry(std::shared_ptr<ManualRawInputSensor> origin) : _origin(std::move(origin)) {}
 
-	shared_ptr<IContext> RetrieveContext() override
+	shared_ptr<IContext> RetrieveContext(bool isInPreviewMode) override
 	{
 		return std::make_shared<XorContext>(_origin);
 	}
 
 	void ReleaseContext(const IContext &context) override {}
+	void ForceReleaseAll() override {}
 
 	~ContextRegistry() = default;
 
