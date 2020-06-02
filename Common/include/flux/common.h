@@ -22,6 +22,7 @@
 #include <flux/manual/identity_activity_unit.h>
 
 #include <flux/neat/neat_activity_unit.h>
+#include <flux/neat/hyper_neat_activity_unit.h>
 #include <flux/neat/neat_entity_descriptor.h>
 
 #endif //FLUXNEAT_COMMON_H

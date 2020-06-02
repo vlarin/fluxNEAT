@@ -1,5 +1,5 @@
-#ifndef MLPACK_METHODS_HNEAT_GENE_HPP
-#define MLPACK_METHODS_HNEAT_GENE_HPP
+#ifndef MLPACK_METHODS_HNEAT_SUBSTRATE_HPP
+#define MLPACK_METHODS_HNEAT_SUBSTRATE_HPP
 
 #include <mlpack/prereqs.hpp>
 
@@ -7,7 +7,7 @@
 #include "acyclic_net.hpp"
 #include "gene.hpp"
 
-namespace mlpack{
+namespace mlpack {
 namespace hyperneat /** NeuroEvolution of Augmenting Topologies */ {
 
 /**
@@ -21,10 +21,12 @@ public:
         RadialLayout
     };
 
+    inline Substrate() {}
+
     inline Substrate(const size_t dimensionsCount,
                      const LayoutType layoutType,
                      const std::vector<size_t> &substrateLayers,
-                     const hyperneat::AcyclicNet<ActivationFunction> &cppn,
+                     hyperneat::AcyclicNet<ActivationFunction> &cppn,
                      std::map<size_t, std::map<size_t, ConnectionGene>> cppnDirectedGraph,
                      std::map<size_t, size_t> cppnActivationGraph,
                      std::vector<size_t> cppnNodeDepths) :
@@ -32,44 +34,52 @@ public:
                      dimensionsCount(dimensionsCount),
                      layoutType(layoutType),
                      substrateLayers(substrateLayers),
-                     cppn(cppn),
                      cppnDirectedGraph(cppnDirectedGraph),
                      cppnActivationGraph(cppnActivationGraph),
                      cppnNodeDepths(cppnNodeDepths) {
-        size_t nodeCount = 0;
+        size_t nodeCount = 1;
         for (int i = 0; i < substrateLayers.size(); i++)
         {
             nodeCount += substrateLayers[i];
         }
 
-        ann = AcyclicNet<ActivationFunction>(nodeCount, substrateLayers[0], substrateLayers[substrateLayers.size() - 1], 1.0);
+        ann = neat::AcyclicNet<ActivationFunction>(nodeCount, substrateLayers[0], substrateLayers[substrateLayers.size() - 1], 1.0);
 
         //initializing node depth
+        nodeDepths.push_back(0);
+        int nodeIndex = 0;
         for (int i = 0; i < substrateLayers.size(); i++)
         {
-            int startSize = i > 0 ? substrateLayers[i - 1] : 0;
-            for (int j = startSize; j < substrateLayers[i]; j++)
+            for (int j = nodeIndex; j < nodeIndex + substrateLayers[i]; j++)
             {
                 nodeDepths.push_back(i);
             }
+            nodeIndex += substrateLayers[i];
         }
 
         //building substrate
+        directedGraph.insert(std::make_pair(0, std::map<size_t, neat::ConnectionGene>())); //bias node
         float hyperLengthDelta = 1.0f / substrateLayers.size();
         float hyperLength = 0.0f;
+        nodeIndex = 0;
         for (int i = 0; i < substrateLayers.size() - 1; i++)
         {
-            int startSize = i > 0 ? substrateLayers[i - 1] : 0;
             int endSizeLength = (int)(pow(substrateLayers[i], 1.0 / dimensionsCount));
             int endSize = (int)(pow(endSizeLength, dimensionsCount));
             int nextLayerEndSizeLength = (int)(pow(substrateLayers[i + 1], 1.0 / dimensionsCount));
             int nextLayerEndSize = (int)(pow(nextLayerEndSizeLength, dimensionsCount));
-            for (int j = startSize; j < endSize; j++)
+            for (int j = nodeIndex; j < nodeIndex + endSize; j++)
             {
-                directedGraph.insert(std::make_pair(j, std::map<size_t, ConnectionGene>()));
+                directedGraph.insert(std::make_pair(j + 1, std::map<size_t, neat::ConnectionGene>()));
                 auto from = GetNeuronCubePosition(j, endSizeLength, hyperLength);
-                for (int k = substrateLayers[i]; k < nextLayerEndSize; k++)
+                for (int k = nodeIndex + substrateLayers[i]; k < nodeIndex + substrateLayers[i] + nextLayerEndSize; k++)
                 {
+                    if (i == 0 && j == 0 && k == nodeIndex + substrateLayers[i])
+                    {
+                        neat::ConnectionGene bconn(0, 1.0, 0, k + 1, true);
+                        directedGraph[0].insert(std::make_pair(k + 1, bconn));
+                    }
+
                     auto to = GetNeuronCubePosition(k, nextLayerEndSizeLength, hyperLength + hyperLengthDelta);
 
                     arma::vec weightInput(from.size() * 2, arma::fill::zeros);
@@ -81,11 +91,12 @@ public:
 
                     arma::vec weightOutput(1, arma::fill::zeros);
                     cppn.Evaluate(weightInput, weightOutput, cppnDirectedGraph, cppnActivationGraph, cppnNodeDepths);
-                    ConnectionGene conn(0, weightOutput(0), 0, 0, 0, true);
-                    directedGraph[j].insert(std::make_pair(k, conn));
+                    neat::ConnectionGene conn(0, weightOutput(0), j + 1, k + 1, true);
+                    directedGraph[j + 1].insert(std::make_pair(k + 1, conn));
                 }
             }
             hyperLength += hyperLengthDelta;
+            nodeIndex = nodeIndex + substrateLayers[i];
         }
     }
 
@@ -110,7 +121,7 @@ public:
     {
         if (!isInitialized)
         {
-            return arma::vec(0);
+            return;
         }
 
         ann.Evaluate(input, output, directedGraph, nodeDepths);
@@ -126,15 +137,14 @@ private:
 
     std::vector<size_t> substrateLayers;
 
-    std::map<size_t, std::map<size_t, ConnectionGene>> &directedGraph;
-    std::vector<size_t> &nodeDepths;
+    std::map<size_t, std::map<size_t, neat::ConnectionGene>> directedGraph;
+    std::vector<size_t> nodeDepths;
 
-    AcyclicNet<ActivationFunction> cppn;
     neat::AcyclicNet<ActivationFunction> ann;
 
-    std::map<size_t, std::map<size_t, ConnectionGene>>& cppnDirectedGraph;
+    std::map<size_t, std::map<size_t, ConnectionGene>> cppnDirectedGraph;
     std::map<size_t, size_t> cppnActivationGraph;
-    std::vector<size_t>& cppnNodeDepths;
+    std::vector<size_t> cppnNodeDepths;
 };
 
 } // namespace neat

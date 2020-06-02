@@ -47,7 +47,6 @@ Genome<ActivationFunction>::Genome():
     fitness(0.0),
     connAdditionProb(0.0),
     connDeletionProb(0.0),
-    isAcyclic(true),
     connCount(0)
 { /* Nothing to do here */ }
 
@@ -64,8 +63,7 @@ Genome<ActivationFunction>::Genome(std::vector<size_t> substrateLayers,
                                    const double biasMutationSize,
                                    const double nodeAdditionProb,
                                    const double connAdditionProb,
-                                   const double connDeletionProb,
-                                   const bool isAcyclic):
+                                   const double connDeletionProb):
     substrateLayers(substrateLayers),
     inputNodeCount(inputNodeCount),
     outputNodeCount(outputNodeCount),
@@ -79,54 +77,48 @@ Genome<ActivationFunction>::Genome(std::vector<size_t> substrateLayers,
     nodeDeletionProb(0.0),
     fitness(0.0),
     connAdditionProb(connAdditionProb),
-    connDeletionProb(connDeletionProb),
-    isAcyclic(isAcyclic)
-{
-  // Sets the number of IDs.
-  nextNodeID = inputNodeCount + outputNodeCount + 1;
-
-  size_t counter = 0;
-  // Create connections and add them to the lists.
-  for (size_t i = 0; i <= inputNodeCount; i++)
-  {
-    for (size_t j = inputNodeCount + 1; j <= outputNodeCount + inputNodeCount;
-        j++)
+    connDeletionProb(connDeletionProb)
     {
-      double weight = initialWeight + arma::randn();
-      connectionGeneList.emplace_back(ConnectionGene(counter, weight, i, j));
-      if (directedGraph.find(i) == directedGraph.end())
-      {
-        directedGraph.emplace(std::piecewise_construct,
-                              std::make_tuple(i),
-                              std::make_tuple());
-        directedGraph[i].emplace(j, ConnectionGene(counter++, weight, i, j));
-      }
-      else
-        directedGraph[i].emplace(j, ConnectionGene(counter++, weight, i, j));
+        // Sets the number of IDs.
+        nextNodeID = inputNodeCount + outputNodeCount + 1;
+
+        size_t counter = 0;
+        // Create connections and add them to the lists.
+        for (size_t i = 0; i <= inputNodeCount; i++) {
+            for (size_t j = inputNodeCount + 1; j <= outputNodeCount + inputNodeCount;
+                 j++) {
+                double weight = initialWeight + arma::randn();
+                size_t sourceActivation = (size_t)(MultimodalActivationFunction::Size() * arma::randu());
+                connectionGeneList.emplace_back(ConnectionGene(counter, weight, sourceActivation, i, j));
+                if (directedGraph.find(i) == directedGraph.end()) {
+                    directedGraph.emplace(std::piecewise_construct,
+                                          std::make_tuple(i),
+                                          std::make_tuple());
+                    directedGraph[i].emplace(j, ConnectionGene(counter++, weight, sourceActivation, i, j));
+                } else
+                    directedGraph[i].emplace(j, ConnectionGene(counter++, weight, sourceActivation, i, j));
+            }
+        }
+
+        // Set innovation ID.
+        nextInnovID = counter;
+
+        // Set the number of connections.
+        connCount = counter;
+
+        // If the genome is meant to be acyclic, we must maintain nodeDepths.
+        for (size_t i = 0; i <= inputNodeCount; i++)
+            nodeDepths.push_back(0);
+        size_t inputAndOutputNodeCount = outputNodeCount + inputNodeCount;
+        for (size_t i = inputNodeCount + 1; i <= inputAndOutputNodeCount; i++)
+            nodeDepths.push_back(1);
     }
-  }
 
-  // Set innovation ID.
-  nextInnovID = counter;
-
-  // Set the number of connections.
-  connCount = counter;
-
-  // If the genome is meant to be acyclic, we must maintain nodeDepths.
-  if (isAcyclic)
-  {
-    for (size_t i = 0; i <= inputNodeCount; i++)
-      nodeDepths.push_back(0);
-    size_t inputAndOutputNodeCount = outputNodeCount + inputNodeCount;
-    for (size_t i = inputNodeCount + 1; i <= inputAndOutputNodeCount; i++)
-      nodeDepths.push_back(1);
-  }
-}
-
-// Creates genome object during cyclic reproduction.
+// Creates genome object during acyclic reproduction.
 template <class ActivationFunction>
 Genome<ActivationFunction>::Genome(std::vector<ConnectionGene>&
                                        connectionGeneList,
+                                   std::vector<size_t>& nodeDepths,
                                    std::vector<size_t> substrateLayers,
                                    const size_t inputNodeCount,
                                    const size_t outputNodeCount,
@@ -138,62 +130,9 @@ Genome<ActivationFunction>::Genome(std::vector<ConnectionGene>&
                                    const double biasMutationSize,
                                    const double nodeAdditionProb,
                                    const double connAdditionProb,
-                                   const double connDeletionProb,
-                                   const bool isAcyclic):
+                                   const double connDeletionProb):
     connectionGeneList(connectionGeneList),
     substrateLayers(substrateLayers),
-    inputNodeCount(inputNodeCount),
-    outputNodeCount(outputNodeCount),
-    initialWeight(0.0),
-    nextNodeID(nextNodeID),
-    bias(bias),
-    weightMutationProb(weightMutationProb),
-    weightMutationSize(weightMutationSize),
-    biasMutationProb(biasMutationProb),
-    biasMutationSize(biasMutationSize),
-    nodeAdditionProb(nodeAdditionProb),
-    nodeDeletionProb(0.0),
-    fitness(0.0),
-    connAdditionProb(connAdditionProb),
-    connDeletionProb(connDeletionProb),
-    isAcyclic(isAcyclic),
-    connCount(0)
-{
-  for (size_t i = 0; i < nextNodeID; i++)
-  {
-    directedGraph.emplace(std::piecewise_construct,
-                          std::make_tuple(i),
-                          std::make_tuple());
-  }
-
-  for (size_t i = 0; i < connectionGeneList.size(); i++)
-  {
-    size_t sourceID = connectionGeneList[i].Source();
-    size_t targetID = connectionGeneList[i].Target();
-    directedGraph[sourceID][targetID] = connectionGeneList[i];
-    if (connectionGeneList[i].Enabled())
-      connCount++;
-  }
-}
-
-// Creates genome object during acyclic reproduction.
-template <class ActivationFunction>
-Genome<ActivationFunction>::Genome(std::vector<ConnectionGene>&
-                                       connectionGeneList,
-                                   std::vector<size_t>& nodeDepths,
-                                   const size_t inputNodeCount,
-                                   const size_t outputNodeCount,
-                                   const size_t nextNodeID,
-                                   const double bias,
-                                   const double weightMutationProb,
-                                   const double weightMutationSize,
-                                   const double biasMutationProb,
-                                   const double biasMutationSize,
-                                   const double nodeAdditionProb,
-                                   const double connAdditionProb,
-                                   const double connDeletionProb,
-                                   const bool isAcyclic):
-    connectionGeneList(connectionGeneList),
     nodeDepths(nodeDepths),
     initialWeight(0.0),
     inputNodeCount(inputNodeCount),
@@ -209,7 +148,6 @@ Genome<ActivationFunction>::Genome(std::vector<ConnectionGene>&
     fitness(0.0),
     connAdditionProb(connAdditionProb),
     connDeletionProb(connDeletionProb),
-    isAcyclic(isAcyclic),
     connCount(0)
 {
   for (size_t i = 0; i < nextNodeID; i++)
@@ -233,7 +171,7 @@ Genome<ActivationFunction>::Genome(std::vector<ConnectionGene>&
 template <class ActivationFunction>
 arma::vec Genome<ActivationFunction>::Evaluate(const arma::vec& input)
 {
-    if (input.n_elem != inputNodeCount) {
+    if (input.n_elem != substrateLayers[0]) {
         Log::Fatal << "The input should have the same length as the number of"
                       "input nodes" << std::endl;
     }
@@ -249,8 +187,8 @@ arma::vec Genome<ActivationFunction>::Evaluate(const arma::vec& input)
         }
 
         //generate CPPN (pattern producer network)
-        AcyclicNet<ActivationFunction> net(nextNodeID, inputNodeCount * 2, 1, bias);
-        substrate = Substrate<ActivationFunction>(inputNodeCount,
+        AcyclicNet<ActivationFunction> net(nextNodeID, inputNodeCount, 1, bias);
+        substrate = Substrate<ActivationFunction>(inputNodeCount / 2 - 1,
                                                   Substrate<ActivationFunction>::CubeTopLeftToBottomRightLayout,
                                                   substrateLayers, net, directedGraph, activations, nodeDepths);
     }
@@ -357,7 +295,7 @@ void Genome<ActivationFunction>::AddConnMutation()
   size_t newTarget = sourceID;
   size_t innovID;
 
-  if (isAcyclic)
+  //if (isAcyclic)
   {
     // Only create connections where the target has a higher depth.
     while (nodeDepths[sourceID] >= nodeDepths[newTarget])
@@ -366,11 +304,11 @@ void Genome<ActivationFunction>::AddConnMutation()
           - 1);
     }
   }
-  else
+  /**else
   {
     newTarget = arma::randi<arma::uvec>(1, arma::distr_param(1 +
         (int)(inputNodeCount), (int)(nextNodeID) - 1))[0];
-  }
+  }*/
 
   size_t activationType = (size_t)(MultimodalActivationFunction::Size() * arma::randu());
 
@@ -470,7 +408,7 @@ void Genome<ActivationFunction>::AddNodeMutation()
   connectionGeneList[i].Enabled() = false;
 
   // If the genome is acyclic, change the depths.
-  if (isAcyclic)
+  //if (isAcyclic)
   {
     nodeDepths.push_back(nodeDepths[sourceID] + 1);
 
@@ -505,7 +443,7 @@ void Genome<ActivationFunction>::DelConnMutation()
 
   // If the genome is acyclic, change the depths.
   // Think of a better way to do this.
-  if (isAcyclic)
+  //if (isAcyclic)
   {
     std::fill(nodeDepths.begin(), nodeDepths.end(), 0);
     for (size_t j = 0; j <= inputNodeCount; j++)
@@ -539,16 +477,15 @@ void Genome<ActivationFunction>::serialize(Archive& ar,
   ar & BOOST_SERIALIZATION_NVP(connDeletionProb);
   ar & BOOST_SERIALIZATION_NVP(nodeDeletionProb);
   ar & BOOST_SERIALIZATION_NVP(fitness);
-  ar & BOOST_SERIALIZATION_NVP(isAcyclic);
   ar & BOOST_SERIALIZATION_NVP(connCount);
   ar & BOOST_SERIALIZATION_NVP(connectionGeneList);
   ar & BOOST_SERIALIZATION_NVP(substrateLayers);
   ar & BOOST_SERIALIZATION_NVP(nextInnovID);
   ar & BOOST_SERIALIZATION_NVP(mutationBuffer);
-  if (isAcyclic)
+  //if (isAcyclic)
     ar & BOOST_SERIALIZATION_NVP(nodeDepths);
-  else
-    ar & BOOST_SERIALIZATION_NVP(outputNodeValues);
+  //else
+  //  ar & BOOST_SERIALIZATION_NVP(outputNodeValues);
   
   if (Archive::is_loading::value)
   {

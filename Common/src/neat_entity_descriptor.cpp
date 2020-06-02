@@ -29,7 +29,8 @@ std::string flux::NeatEntityDescriptor::ToString()
 
     for (int i = 0 ; i < ConnectionsCount; i++)
     {
-        s << "Connection From: " << NeuronConnections[i].OriginId << " To: " << NeuronConnections[i].DestinationId << " W: " << NeuronConnections[i].Weight << std::endl;
+        s << "Connection From: " << NeuronConnections[i].OriginId << " To: " << NeuronConnections[i].DestinationId
+        << " W: " << NeuronConnections[i].Weight << " M: " << NeuronConnections[i].Meta << std::endl;
     }
 
     s << std::endl;

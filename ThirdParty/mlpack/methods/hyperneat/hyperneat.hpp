@@ -18,9 +18,8 @@
 #include <mlpack/methods/kmeans/dual_tree_kmeans.hpp>
 #include <mlpack/methods/ann/activation_functions/hard_sigmoid_function.hpp>
 #include "genome.hpp"
-#include "selection_strategies/rank_selection.hpp"
-#include "selection_strategies/tournament_selection.hpp"
-
+#include <mlpack/methods/neat/selection_strategies/rank_selection.hpp>
+#include <mlpack/methods/neat/selection_strategies/tournament_selection.hpp>
 
 namespace mlpack{
 namespace hyperneat /** NeuroEvolution of Augmenting Topologies */ {
@@ -40,7 +39,7 @@ HAS_MEM_FUNC(StartingGenome, HasStartingGenome);
 template <class TaskType,
           class ActivationFunction = ann::HardSigmoidFunction,
           class SelectionPolicy = RankSelection>
-class NEAT
+class HyperNEAT
 {
  public:
   /**

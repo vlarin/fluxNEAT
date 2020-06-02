@@ -14,6 +14,7 @@
 
 #include <mlpack/prereqs.hpp>
 #include "gene.hpp"
+#include "substrate.hpp"
 
 namespace mlpack{
 namespace hyperneat /** NeuroEvolution of Augmenting Topologies */ {
@@ -91,7 +92,6 @@ class Genome
    * @param connAdditionProb The probability of a new connection being added.
    * @param connDeletionProb The probability of a connection being deleted.
    * @param isAcyclic Denotes whether or not the generated network is acyclic.
-   */
   Genome(std::vector<ConnectionGene>& connectionGeneList,
          std::vector<size_t> substrateLayers,
          const size_t cppnInputNodeCount,
@@ -104,7 +104,7 @@ class Genome
          const double biasMutationSize,
          const double nodeAdditionProb,
          const double connAdditionProb,
-         const double connDeletionProb);
+         const double connDeletionProb);*/
 
   /**
    * Creates a genome. Used during acyclic reproduction.

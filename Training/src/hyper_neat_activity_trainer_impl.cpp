@@ -1,16 +1,18 @@
-#include "include/neat_activity_trainer_impl.h"
+#include "include/hyper_neat_activity_trainer_impl.h"
 
 #include <utility>
 #include <algorithm>
 
-static flux::NeatEmptyTask empty;
+static flux::HyperNeatEmptyTask empty;
 
-flux::NeatActivityTrainer::NeatActivityTrainerImpl::NeatActivityTrainerImpl(size_t populationSize,
+flux::NeatActivityTrainer::HyperNeatActivityTrainerImpl::HyperNeatActivityTrainerImpl(size_t populationSize,
         size_t numSpecies,
         size_t parallelPoolSize,
         size_t complexityThreshold,
         size_t maxSimplifyGeneration,
+        size_t cppnDimensions,
         flux::NeatEvolutionParameters evolutionParameters,
+        std::vector<size_t> substrateLayers,
         std::shared_ptr<IEvaluationOutputUnit> trainingFitnessUnitProto,
         std::shared_ptr<IBlackBox> trainingProto,
         std::shared_ptr<IContextRegistry> trainingPool,
@@ -18,11 +20,12 @@ flux::NeatActivityTrainer::NeatActivityTrainerImpl::NeatActivityTrainerImpl(size
         : _populationSize(populationSize),
         _parallelPoolSize(parallelPoolSize),
         _evolutionParameters(evolutionParameters),
+        _substrateLayers(substrateLayers),
         _trainingFitnessUnitProto(std::move(trainingFitnessUnitProto)),
         _trainingProto(std::move(trainingProto)),
         _trainingPool(std::move(trainingPool)),
         _targetId(target->GetId()),
-        _training(empty, target->GetInputIds().size(), target->GetOutputIds().size(), populationSize,
+        _training(empty, substrateLayers, (cppnDimensions + 1) * 2, 1, populationSize,
                 0 /** max generations (unused) */ ,
                 numSpecies,
                 1 /** initial weight */,
@@ -39,46 +42,46 @@ flux::NeatActivityTrainer::NeatActivityTrainerImpl::NeatActivityTrainerImpl(size
                 0 /** finalFitness */,
                 complexityThreshold,
                 maxSimplifyGeneration,
-                evolutionParameters.IsAcyclic)
+                true)
 
 {
     // Initialize all genomes to evaluate
     _training.ForceInit();
 }
 
-bool flux::NeatActivityTrainer::NeatActivityTrainerImpl::IsEpochCompleted() const
+bool flux::NeatActivityTrainer::HyperNeatActivityTrainerImpl::IsEpochCompleted() const
 {
     return _currentEvaluations.empty() && _evaluationQueue.empty();
 }
 
-size_t flux::NeatActivityTrainer::NeatActivityTrainerImpl::GetCurrentEpoch() const
+size_t flux::NeatActivityTrainer::HyperNeatActivityTrainerImpl::GetCurrentEpoch() const
 {
     return _epochNumber;
 }
 
-bool flux::NeatActivityTrainer::NeatActivityTrainerImpl::IsComplexifying() const
+bool flux::NeatActivityTrainer::HyperNeatActivityTrainerImpl::IsComplexifying() const
 {
 	return _training.IsComplexifying();
 }
 
-const flux::NeatEvolutionParameters &flux::NeatActivityTrainer::NeatActivityTrainerImpl::GetEvolutionParameters() const {
+const flux::NeatEvolutionParameters &flux::NeatActivityTrainer::HyperNeatActivityTrainerImpl::GetEvolutionParameters() const {
     return _evolutionParameters;
 }
 
-void flux::NeatActivityTrainer::NeatActivityTrainerImpl::SaveCurrentChampionActivity(std::ostream &stream) const
+void flux::NeatActivityTrainer::HyperNeatActivityTrainerImpl::SaveCurrentChampionActivity(std::ostream &stream) const
 {
     boost::archive::text_oarchive ar(stream);
     ar << _currentChampion;
 }
 
-void flux::NeatActivityTrainer::NeatActivityTrainerImpl::SaveEvolutionState(std::ostream &stream) const
+void flux::NeatActivityTrainer::HyperNeatActivityTrainerImpl::SaveEvolutionState(std::ostream &stream) const
 {
     boost::archive::binary_oarchive ar(stream);
 
     ar << _training;
 }
 
-void flux::NeatActivityTrainer::NeatActivityTrainerImpl::LoadEvolutionState(std::istream &stream)
+void flux::NeatActivityTrainer::HyperNeatActivityTrainerImpl::LoadEvolutionState(std::istream &stream)
 {
     boost::archive::binary_iarchive ar(stream);
 
@@ -87,7 +90,7 @@ void flux::NeatActivityTrainer::NeatActivityTrainerImpl::LoadEvolutionState(std:
     //TODO: wipe current evaluations & epoch
 }
 
-void flux::NeatActivityTrainer::NeatActivityTrainerImpl::Step(flux::float_fl delta)
+void flux::NeatActivityTrainer::HyperNeatActivityTrainerImpl::Step(flux::float_fl delta)
 {
     if (IsEpochCompleted())
     {
@@ -129,7 +132,7 @@ void flux::NeatActivityTrainer::NeatActivityTrainerImpl::Step(flux::float_fl del
     }
 }
 
-void flux::NeatActivityTrainer::NeatActivityTrainerImpl::StartEpoch()
+void flux::NeatActivityTrainer::HyperNeatActivityTrainerImpl::StartEpoch()
 {
     for (auto i = 0; i < _training.Genomes().size(); ++i)
     {
@@ -139,7 +142,7 @@ void flux::NeatActivityTrainer::NeatActivityTrainerImpl::StartEpoch()
     }
 }
 
-void flux::NeatActivityTrainer::NeatActivityTrainerImpl::EndEpoch()
+void flux::NeatActivityTrainer::HyperNeatActivityTrainerImpl::EndEpoch()
 {
     _meanFitness = 0;
     for (const auto &genome : _training.Genomes())
@@ -157,7 +160,7 @@ void flux::NeatActivityTrainer::NeatActivityTrainerImpl::EndEpoch()
 
     _championEntityDescriptor.Fitness = -1;
     _currentEntitiesDescriptors.clear();
-    std::vector<std::vector<mlpack::neat::Genome<>>> species = _training.SpeciesClusters();
+    std::vector<std::vector<mlpack::hyperneat::Genome<>>> species = _training.SpeciesClusters();
     int32_t id = 0;
     int32_t specieId = 0;
 
@@ -178,7 +181,7 @@ void flux::NeatActivityTrainer::NeatActivityTrainerImpl::EndEpoch()
     }
 }
 
-void flux::NeatActivityTrainer::NeatActivityTrainerImpl::EmplaceForEvaluation(EvaluationEntry entry)
+void flux::NeatActivityTrainer::HyperNeatActivityTrainerImpl::EmplaceForEvaluation(EvaluationEntry entry)
 {
     std::shared_ptr<IContext> slot = _trainingPool->RetrieveContext(false);
     entry.FitnessEvaluatorUnit = std::static_pointer_cast<IEvaluationOutputUnit>(_trainingFitnessUnitProto->Clone(slot));
@@ -196,57 +199,57 @@ void flux::NeatActivityTrainer::NeatActivityTrainerImpl::EmplaceForEvaluation(Ev
 }
 
 
-flux::float_fl flux::NeatActivityTrainer::NeatActivityTrainerImpl::GetBestFitness() const
+flux::float_fl flux::NeatActivityTrainer::HyperNeatActivityTrainerImpl::GetBestFitness() const
 {
     return _bestChampion.Fitness();
 }
 
-flux::float_fl flux::NeatActivityTrainer::NeatActivityTrainerImpl::GetChampionFitness() const
+flux::float_fl flux::NeatActivityTrainer::HyperNeatActivityTrainerImpl::GetChampionFitness() const
 {
     return _currentChampion.Fitness();
 }
 
-flux::NeatEntityDescriptor flux::NeatActivityTrainer::NeatActivityTrainerImpl::GetChampionEntity() const
+flux::NeatEntityDescriptor flux::NeatActivityTrainer::HyperNeatActivityTrainerImpl::GetChampionEntity() const
 {
     return _championEntityDescriptor;
 }
 
-std::vector<flux::NeatEntityDescriptor> flux::NeatActivityTrainer::NeatActivityTrainerImpl::GetCurrentEntities() const
+std::vector<flux::NeatEntityDescriptor> flux::NeatActivityTrainer::HyperNeatActivityTrainerImpl::GetCurrentEntities() const
 {
     return _currentEntitiesDescriptors;
 }
 
-flux::float_fl flux::NeatActivityTrainer::NeatActivityTrainerImpl::GetMeanFitness() const
+flux::float_fl flux::NeatActivityTrainer::HyperNeatActivityTrainerImpl::GetMeanFitness() const
 {
     return _meanFitness;
 }
 
-flux::float_fl flux::NeatActivityTrainer::NeatActivityTrainerImpl::GetMeanComplexity() const
+flux::float_fl flux::NeatActivityTrainer::HyperNeatActivityTrainerImpl::GetMeanComplexity() const
 {
     return _meanComplexity;
 }
 
-flux::float_fl flux::NeatActivityTrainer::NeatActivityTrainerImpl::GetMeanEvaluationDuration() const
+flux::float_fl flux::NeatActivityTrainer::HyperNeatActivityTrainerImpl::GetMeanEvaluationDuration() const
 {
     return _meanEvaluationDuration;
 }
 
-flux::float_fl flux::NeatActivityTrainer::NeatActivityTrainerImpl::GetEvaluationPerSec() const
+flux::float_fl flux::NeatActivityTrainer::HyperNeatActivityTrainerImpl::GetEvaluationPerSec() const
 {
     return _totalEvaluations / _totalEvaluationTime;
 }
 
-flux::float_fl flux::NeatActivityTrainer::NeatActivityTrainerImpl::GetTotalEvaluations() const
+flux::float_fl flux::NeatActivityTrainer::HyperNeatActivityTrainerImpl::GetTotalEvaluations() const
 {
     return _totalEvaluations;
 }
 
-flux::float_fl flux::NeatActivityTrainer::NeatActivityTrainerImpl::GetTotalEvaluationTime() const
+flux::float_fl flux::NeatActivityTrainer::HyperNeatActivityTrainerImpl::GetTotalEvaluationTime() const
 {
     return _totalEvaluationTime;
 }
 
-flux::NeatEntityDescriptor flux::NeatActivityTrainer::NeatActivityTrainerImpl::CreateDescriptorOf(int32_t id, int32_t specieId, mlpack::neat::Genome<> genome) const
+flux::NeatEntityDescriptor flux::NeatActivityTrainer::HyperNeatActivityTrainerImpl::CreateDescriptorOf(int32_t id, int32_t specieId, mlpack::hyperneat::Genome<> genome) const
 {
     auto *neurons = new NeatEntityDescriptor::Neuron[genome.NodeCount()];
     auto *connections = new NeatEntityDescriptor::NeuronConnection[genome.Complexity()];
@@ -278,7 +281,8 @@ flux::NeatEntityDescriptor flux::NeatActivityTrainer::NeatActivityTrainerImpl::C
         connections[k] = NeatEntityDescriptor::NeuronConnection(
                 genome.connectionGeneList[i].Source(),
                 genome.connectionGeneList[i].Target(),
-                genome.connectionGeneList[i].Weight());
+                genome.connectionGeneList[i].Weight(),
+                genome.connectionGeneList[i].SourceActivation());
 		k++;
     }
 
@@ -317,7 +321,7 @@ flux::NeatEntityDescriptor flux::NeatActivityTrainer::NeatActivityTrainerImpl::C
     return { id, specieId, genome.Complexity(), genome.Fitness(), genome.NodeCount(), genome.Complexity(), neurons, connections };
 }
 
-void flux::NeatActivityTrainer::NeatActivityTrainerImpl::DumpState(std::ostream &stream)
+void flux::NeatActivityTrainer::HyperNeatActivityTrainerImpl::DumpState(std::ostream &stream)
 {
     boost::archive::text_oarchive ar(stream);
     auto genomes = _training.Genomes();

@@ -19,10 +19,12 @@ add_library(fluxNEAT.Training
         ${fluxNeat-Training-ProductVersionFiles}
 
         src/include/neat_activity_trainer_impl.h
+        src/include/hyper_neat_activity_trainer_impl.h
 
         src/neat_evolution_params.cpp
         src/neat_activity_trainer.cpp
-        src/neat_activity_trainer_impl.cpp)
+        src/neat_activity_trainer_impl.cpp
+        src/hyper_neat_activity_trainer_impl.cpp)
 
 target_link_libraries(fluxNEAT.Training ${Boost_LIBRARIES})
 target_include_directories(fluxNEAT.Training PUBLIC ${CMAKE_SOURCE_DIR}/Common/include)

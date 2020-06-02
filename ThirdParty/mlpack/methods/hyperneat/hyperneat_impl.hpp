@@ -79,7 +79,7 @@ HyperNEAT(TaskType& task,
 template <class TaskType,
           class ActivationFunction,
           class SelectionPolicy>
-void NEAT<TaskType, ActivationFunction, SelectionPolicy>
+void HyperNEAT<TaskType, ActivationFunction, SelectionPolicy>
     ::Train(Genome<ActivationFunction>& genome)
 {
   Genome<ActivationFunction>::nextInnovID = 0;
@@ -555,20 +555,20 @@ Genome<ActivationFunction> HyperNEAT<TaskType, ActivationFunction, SelectionPoli
     }
   }
 
-  if (isAcyclic)
+  //if (isAcyclic)
   {
-    return Genome<ActivationFunction>(newConnGeneList, substrateLayers, nodeDepths,
+    return Genome<ActivationFunction>(newConnGeneList, nodeDepths, substrateLayers,
       inputNodeCount, outputNodeCount, nextNodeID, bias, weightMutationProb,
       weightMutationSize, biasMutationProb, biasMutationSize,
-      nodeAdditionProb, connAdditionProb, connDeletionProb, isAcyclic);
+      nodeAdditionProb, connAdditionProb, connDeletionProb);
   }
-  else
+  /**else
   {
     return Genome<ActivationFunction>(newConnGeneList, substrateLayers, inputNodeCount,
       outputNodeCount, nextNodeID, bias, weightMutationProb,
       weightMutationSize, biasMutationProb, biasMutationSize,
-      nodeAdditionProb, connAdditionProb, connDeletionProb, isAcyclic);
-  }
+      nodeAdditionProb, connAdditionProb, connDeletionProb);
+  }*/
 }
 
 template <class TaskType,
@@ -611,7 +611,7 @@ HyperNEAT<TaskType, ActivationFunction, SelectionPolicy>::Initialize()
       genomeList.emplace_back(Genome<ActivationFunction>(connGeneList, substrateLayers,
       inputNodeCount, outputNodeCount, maxNodeID + 1, bias, weightMutationProb,
       weightMutationSize, biasMutationProb, biasMutationSize, nodeAdditionProb,
-      connAdditionProb, connDeletionProb, isAcyclic));
+      connAdditionProb, connDeletionProb));
 
       // Let's find the node depths.
       genomeList[i].nodeDepths.resize(genomeList[i].NodeCount(), 0);
@@ -626,7 +626,7 @@ HyperNEAT<TaskType, ActivationFunction, SelectionPolicy>::Initialize()
       genomeList.emplace_back(Genome<ActivationFunction>(connGeneList, substrateLayers,
       inputNodeCount, outputNodeCount, maxNodeID + 1, bias, weightMutationProb,
       weightMutationSize, biasMutationProb, biasMutationSize, nodeAdditionProb,
-      connAdditionProb, connDeletionProb, isAcyclic));
+      connAdditionProb, connDeletionProb));
 
       genomeList[i].MutateWeights();
     }
@@ -647,10 +647,10 @@ HyperNEAT<TaskType, ActivationFunction, SelectionPolicy>::Initialize()
     for (size_t i = 0; i < popSize; i++)
     {
       double bias = initialBias + arma::randn();
-      genomeList.emplace_back(Genome<ActivationFunction>(substrateLayers, inputNodeCount,
+      genomeList.emplace_back(hyperneat::Genome<ActivationFunction>(substrateLayers, inputNodeCount,
           outputNodeCount, bias, initialWeight, weightMutationProb,
           weightMutationSize, biasMutationProb, biasMutationSize,
-          nodeAdditionProb, connAdditionProb, connDeletionProb, isAcyclic));
+          nodeAdditionProb, connAdditionProb, connDeletionProb));
       genomeList[i].MutateWeights();
     }
   }

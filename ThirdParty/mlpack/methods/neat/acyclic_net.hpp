@@ -15,6 +15,7 @@
 #define MLPACK_METHODS_NEAT_ACYCLIC_NET_HPP
 
 #include <mlpack/prereqs.hpp>
+#include "gene.hpp"
 
 namespace mlpack{
 namespace neat /** NeuroEvolution of Augmenting Topologies */{
@@ -37,6 +38,9 @@ template <class ActivationFunction>
 class AcyclicNet
 {
  public:
+
+    inline AcyclicNet() {}
+
   /**
    * Creates an AcyclicNet object.
    *
@@ -58,6 +62,9 @@ class AcyclicNet
                 std::map<size_t, std::map<size_t, ConnectionGene>>&
                     directedGraph,
                 const std::vector<size_t>& nodeDepths);
+
+  AcyclicNet<ActivationFunction> &operator =(const AcyclicNet<ActivationFunction> &other) = default;
+
  private:
   //! The number of nodes.
   size_t nodeCount;

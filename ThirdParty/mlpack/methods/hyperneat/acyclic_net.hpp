@@ -37,6 +37,7 @@ template <class ActivationFunction>
 class AcyclicNet
 {
  public:
+  inline AcyclicNet() {}
   /**
    * Creates an AcyclicNet object.
    *
@@ -58,6 +59,8 @@ class AcyclicNet
                 std::map<size_t, std::map<size_t, ConnectionGene>>& directedGraph,
                 std::map<size_t, size_t> activationGraph,
                 const std::vector<size_t>& nodeDepths);
+
+    AcyclicNet<ActivationFunction> &operator =(const AcyclicNet<ActivationFunction> &other) = default;
  private:
   //! The number of nodes.
   size_t nodeCount;

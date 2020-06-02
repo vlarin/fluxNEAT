@@ -25,7 +25,9 @@ namespace flux {
                 size_t parallelPoolSize,
                 size_t complexityThreshold,
                 size_t  maxSimplifyGeneration,
+                size_t cppnDimensions,
                 NeatEvolutionParameters evolutionParameters,
+                std::vector<size_t> substrateLayers,
                 const std::shared_ptr<IActivityUnit> &target,
                 const std::shared_ptr<IEvaluationOutputUnit>& trainingFitnessUnitProto,
                 const std::shared_ptr<IBlackBox>& trainingProto,
@@ -61,6 +63,11 @@ namespace flux {
     private:
         class NeatActivityTrainerImpl;
         std::unique_ptr<NeatActivityTrainerImpl> _impl;
+
+        class HyperNeatActivityTrainerImpl;
+        std::unique_ptr<HyperNeatActivityTrainerImpl> _himpl;
+
+        bool _isHyper;
     };
 }
 

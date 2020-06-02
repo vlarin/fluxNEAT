@@ -37,11 +37,18 @@ namespace flux {
             int32_t OriginId;
             int32_t DestinationId;
             float_fl Weight;
+            int16_t Meta;
 
             NeuronConnection() = default;
             NeuronConnection(int32_t originId, int32_t destinationId, float_fl weight) : OriginId(originId),
                                                                                          DestinationId(destinationId),
-                                                                                         Weight(weight) {}
+                                                                                         Weight(weight),
+                                                                                         Meta(0) {}
+
+            NeuronConnection(int32_t originId, int32_t destinationId, float_fl weight, int16_t meta) : OriginId(originId),
+                                                                                         DestinationId(destinationId),
+                                                                                         Weight(weight),
+                                                                                         Meta(meta) {}
         };
 
         int32_t Id;

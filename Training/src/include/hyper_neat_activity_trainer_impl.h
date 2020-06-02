@@ -2,36 +2,39 @@
 // Copyright (c) 2019-2020 Temporal Games Inc. All rights reserved.
 //
 
-#ifndef FLUXNEAT_NEAT_ACTIVITY_TRAINER_IMPL_H
-#define FLUXNEAT_NEAT_ACTIVITY_TRAINER_IMPL_H
+#ifndef FLUXNEAT_HNEAT_ACTIVITY_TRAINER_IMPL_H
+#define FLUXNEAT_HNEAT_ACTIVITY_TRAINER_IMPL_H
 
 #include <flux/training/neat_activity_trainer.h>
 #include <flux/neat/neat_entity_descriptor.h>
 
 #include <mlpack/core.hpp>
-#include <mlpack/methods/neat/neat.hpp>
+#include <mlpack/methods/hyperneat/hyperneat.hpp>
+
 
 namespace flux {
 
-    class NeatEmptyTask
+    class HyperNeatEmptyTask
     {
     public:
-        //std::vector<mlpack::neat::ConnectionGene> StartingGenome() { }
+        //std::vector<mlpack::hyperneat::ConnectionGene> StartingGenome() { }
 
-        double Evaluate(mlpack::neat::Genome<> &genome) { return 0; }
+        double Evaluate(mlpack::hyperneat::Genome<> &genome) { return 0; }
         template<typename Archive>
         void serialize(Archive& ar, const unsigned int /* version */) {}
     };
 
-    class NeatActivityTrainer::NeatActivityTrainerImpl
+    class NeatActivityTrainer::HyperNeatActivityTrainerImpl
     {
     public:
-        NeatActivityTrainerImpl(size_t populationSize,
+        HyperNeatActivityTrainerImpl(size_t populationSize,
         size_t numSpecies,
         size_t parallelPoolSize,
         size_t complexityThreshold,
         size_t  maxSimplifyGeneration,
+        size_t cppnDimensions,
         NeatEvolutionParameters evolutionParameters,
+        std::vector<size_t> substrateLayers,
         std::shared_ptr<IEvaluationOutputUnit> trainingFitnessUnitProto,
         std::shared_ptr<IBlackBox> trainingProto,
         std::shared_ptr<IContextRegistry> trainingPool,
@@ -64,7 +67,7 @@ namespace flux {
         void SaveEvolutionState(std::ostream &stream) const;
         void LoadEvolutionState(std::istream &stream);
 
-        ~NeatActivityTrainerImpl() = default;
+        ~HyperNeatActivityTrainerImpl() = default;
     private:
         struct EvaluationEntry
         {
@@ -92,12 +95,12 @@ namespace flux {
         std::vector<NeatEntityDescriptor> _currentEntitiesDescriptors;
         NeatEntityDescriptor _championEntityDescriptor;
 
-        mlpack::neat::Genome<> _bestChampion;
-        mlpack::neat::Genome<> _currentChampion;
+        mlpack::hyperneat::Genome<> _bestChampion;
+        mlpack::hyperneat::Genome<> _currentChampion;
         std::vector<EvaluationEntry> _currentEvaluations;
         std::vector<EvaluationEntry> _evaluationQueue;
 
-        mlpack::neat::NEAT<NeatEmptyTask> _training;
+        mlpack::hyperneat::HyperNEAT<HyperNeatEmptyTask> _training;
         std::shared_ptr<IBlackBox> _trainingProto;
         std::shared_ptr<IContextRegistry> _trainingPool;
         std::shared_ptr<IEvaluationOutputUnit> _trainingFitnessUnitProto;
@@ -107,7 +110,7 @@ namespace flux {
 
         void EmplaceForEvaluation(EvaluationEntry entry);
 
-        NeatEntityDescriptor CreateDescriptorOf(int32_t id, int32_t specieId, mlpack::neat::Genome<> genome) const;
+        NeatEntityDescriptor CreateDescriptorOf(int32_t id, int32_t specieId, mlpack::hyperneat::Genome<> genome) const;
     };
 }
 
