@@ -35,6 +35,7 @@ add_library(fluxNEAT.Common
         include/flux/output_unit.h
         include/flux/raw_sensor_unit.h
         include/flux/augmented_sensor_unit.h
+        include/flux/augmented_activity_sensor_unit.h
         include/flux/activity_unit.h
         include/flux/feedback/feedback_unit.h
         include/flux/feedback/mediator_value.h
