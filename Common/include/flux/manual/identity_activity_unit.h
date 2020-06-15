@@ -19,8 +19,8 @@ namespace flux
     public:
         IdentityActivityUnit(NeuralNodeId target, NeuralNodeId outputId, std::string id, std::shared_ptr<IContext> context);
 
-        std::set<NeuralNodeId> GetInputIds() const override ;
-        std::set<NeuralNodeId> GetOutputIds() const override ;
+        std::vector<NeuralNodeId> GetInputIds() const override ;
+        std::vector<NeuralNodeId> GetOutputIds() const override ;
 
         std::vector<NeuralNode> Activate(const std::vector<NeuralNode> &inputs) const override ;
 

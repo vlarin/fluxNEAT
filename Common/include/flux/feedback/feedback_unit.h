@@ -22,7 +22,7 @@ namespace flux
     protected:
         IFeedbackUnit(std::string id, std::shared_ptr<IContext> context) : IContextUnit(std::move(id), std::move(context)) {}
     public:
-        virtual std::set<NeuralNodeId> GetInputIds() const = 0;
+        virtual std::vector<NeuralNodeId> GetInputIds() const = 0;
 
         virtual std::vector<MediatorValue> Activate(const std::vector<NeuralNode> &inputs) const = 0;
     };

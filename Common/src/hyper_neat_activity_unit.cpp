@@ -1,12 +1,12 @@
 #include "flux/neat/hyper_neat_activity_unit.h"
 #include "include/hyper_neat_activity_unit_impl.h"
 
-std::set<flux::NeuralNodeId> flux::HyperNeatActivityUnit::GetInputIds() const
+std::vector<flux::NeuralNodeId> flux::HyperNeatActivityUnit::GetInputIds() const
 {
     return _inputIds;
 }
 
-std::set<flux::NeuralNodeId> flux::HyperNeatActivityUnit::GetOutputIds() const
+std::vector<flux::NeuralNodeId> flux::HyperNeatActivityUnit::GetOutputIds() const
 {
     return _outputIds;
 }
@@ -33,8 +33,8 @@ std::vector<flux::NeuralNode> flux::HyperNeatActivityUnit::Activate(const std::v
 }
 
 flux::HyperNeatActivityUnit::HyperNeatActivityUnit(const std::string &id, const std::shared_ptr<IContext> &context,
-                                         const std::set<NeuralNodeId> &inputIds,
-                                         const std::set<NeuralNodeId> &outputIds)
+                                         const std::vector<NeuralNodeId> &inputIds,
+                                         const std::vector<NeuralNodeId> &outputIds)
                                          : IActivityUnit(id, context),
                                          _inputIds(inputIds),
                                          _outputIds(outputIds)

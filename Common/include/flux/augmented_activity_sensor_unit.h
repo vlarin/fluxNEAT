@@ -24,8 +24,8 @@ namespace flux {
         explicit AugmentedActivitySensorUnit(std::shared_ptr<IActivityUnit> activity, std::shared_ptr<IContext> context)
         : IAugmentedSensorUnit(activity->GetId(), std::move(context)), _activity(activity) {}
     public:
-        virtual std::set<NeuralNodeId> GetInputIds() const { return _activity->GetInputIds(); }
-        virtual std::set<NeuralNodeId> GetAugmentedInputIds() const { return _activity->GetOutputIds(); }
+        virtual std::vector<NeuralNodeId> GetInputIds() const { return _activity->GetInputIds(); }
+        virtual std::vector<NeuralNodeId> GetAugmentedInputIds() const { return _activity->GetOutputIds(); }
 
         virtual std::vector<NeuralNode> ApplyAugmentation(const std::vector<NeuralNode> &rawInputs) const
         {

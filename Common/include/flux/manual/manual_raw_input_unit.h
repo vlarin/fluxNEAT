@@ -13,10 +13,10 @@ namespace flux {
     class FLUX_API ManualRawInputSensor : public IRawSensorUnit
     {
     public:
-        ManualRawInputSensor(std::string id, std::shared_ptr<IContext> context, std::set<NeuralNodeId> inputIds, bool verbose = false);
+        ManualRawInputSensor(std::string id, std::shared_ptr<IContext> context, std::vector<NeuralNodeId> inputIds, bool verbose = false);
 
         bool &IsAutoPlayed() { return _isAutoPlayed; }
-        std::set<NeuralNodeId> GetInputIds() const override { return _inputIds; }
+        std::vector<NeuralNodeId> GetInputIds() const override { return _inputIds; }
         std::vector<NeuralNode> Fetch() const override;
         void Step();
 
@@ -29,7 +29,7 @@ namespace flux {
         bool _verbose;
         bool _isAutoPlayed;
         mutable uint8_t _currentSequenceId;
-        std::set<NeuralNodeId> _inputIds;
+        std::vector<NeuralNodeId> _inputIds;
         std::vector<std::vector<NeuralNode>> _inputSequences;
     };
 }

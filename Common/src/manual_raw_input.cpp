@@ -6,7 +6,7 @@ using namespace flux;
 ManualRawInputSensor::ManualRawInputSensor(
         std::string id,
         std::shared_ptr<IContext> context,
-        std::set<NeuralNodeId> inputIds,
+        std::vector<NeuralNodeId> inputIds,
         bool verbose)
         : IRawSensorUnit(std::move(id), std::move(context)), _inputIds(std::move(inputIds)), _currentSequenceId(0),
         _verbose(verbose),

@@ -21,8 +21,8 @@ namespace flux {
     protected:
         IAugmentedSensorUnit(std::string id, std::shared_ptr<IContext> context) : IContextUnit(std::move(id), std::move(context)) {}
     public:
-        virtual std::set<NeuralNodeId> GetInputIds() const = 0;
-        virtual std::set<NeuralNodeId> GetAugmentedInputIds() const = 0;
+        virtual std::vector<NeuralNodeId> GetInputIds() const = 0;
+        virtual std::vector<NeuralNodeId> GetAugmentedInputIds() const = 0;
 
         virtual std::vector<NeuralNode> ApplyAugmentation(const std::vector<NeuralNode> &rawInputs) const = 0;
     };

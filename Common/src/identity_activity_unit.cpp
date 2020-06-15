@@ -9,14 +9,14 @@ flux::IdentityActivityUnit::IdentityActivityUnit(
         std::shared_ptr<IContext> context) : flux::IActivityUnit(std::move(id), std::move(context)),
         _target(std::move(target)), _outputId(std::move(outputId)) {}
 
-std::set<flux::NeuralNodeId> flux::IdentityActivityUnit::GetInputIds() const
+std::vector<flux::NeuralNodeId> flux::IdentityActivityUnit::GetInputIds() const
 {
-    return std::set<NeuralNodeId> { _target };
+    return std::vector<NeuralNodeId> { _target };
 }
 
-std::set<flux::NeuralNodeId> flux::IdentityActivityUnit::GetOutputIds() const
+std::vector<flux::NeuralNodeId> flux::IdentityActivityUnit::GetOutputIds() const
 {
-    return std::set<NeuralNodeId> { _outputId };
+    return std::vector<NeuralNodeId> { _outputId };
 }
 
 std::vector<flux::NeuralNode> flux::IdentityActivityUnit::Activate(const std::vector<NeuralNode> &inputs) const

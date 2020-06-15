@@ -28,9 +28,9 @@ public:
     DebugOutputUnit(const string &id, const shared_ptr<IContext> &context) : IEvaluationOutputUnit(id, context),
                                                                              _error(0), _evalutionCount(0) {}
 
-    set<NeuralNodeId> GetOutputIds() const override
+    vector<NeuralNodeId> GetOutputIds() const override
     {
-        return std::set<NeuralNodeId> { NeuralNodeId("xor_value") };
+        return std::vector<NeuralNodeId> { NeuralNodeId("xor_value") };
     }
 
     void Apply(const std::map<flux::NeuralNodeId, flux::NeuralNode> &outputs) const override
@@ -103,7 +103,7 @@ int main()
     NeuralNodeId inputB("topRight");
     NeuralNodeId inputC("bottomLeft");
     NeuralNodeId inputD("bottomRight"); // 1
-    set<NeuralNodeId> inputIds = {inputA, inputB, inputC, inputD};
+    vector<NeuralNodeId> inputIds = {inputA, inputB, inputC, inputD};
     auto manualInput = std::make_shared<ManualRawInputSensor>("xor_emu", context, inputIds, false);
 
     manualInput->SetInputsSequence( vector<vector<NeuralNode>>
@@ -116,7 +116,7 @@ int main()
 
     blackBox->AddRawInput(manualInput);
 
-    set<NeuralNodeId> outputIds = { NeuralNodeId("xor_value") };
+    vector<NeuralNodeId> outputIds = { NeuralNodeId("xor_value") };
     auto neatActivity = std::make_shared<HyperNeatActivityUnit>("xor", context, inputIds, outputIds);
 
     blackBox->AddActivity(neatActivity);

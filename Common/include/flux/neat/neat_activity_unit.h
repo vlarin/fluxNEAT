@@ -18,11 +18,11 @@ namespace flux
     {
     public:
         NeatActivityUnit(const std::string &id, const std::shared_ptr<IContext> &context,
-                         const std::set<NeuralNodeId> &inputIds,
-                         const std::set<NeuralNodeId> &outputIds);
+                         const std::vector<NeuralNodeId> &inputIds,
+                         const std::vector<NeuralNodeId> &outputIds);
 
-        std::set<NeuralNodeId> GetInputIds() const override;
-        std::set<NeuralNodeId> GetOutputIds() const override;
+        std::vector<NeuralNodeId> GetInputIds() const override;
+        std::vector<NeuralNodeId> GetOutputIds() const override;
 
         std::vector<NeuralNode> Activate(const std::vector<NeuralNode> &inputs) const override;
 
@@ -35,8 +35,8 @@ namespace flux
         NeatActivityUnit(NeatActivityUnit &&unit) noexcept;
         NeatActivityUnit &operator=(const NeatActivityUnit &other);
     private:
-        std::set<NeuralNodeId> _inputIds;
-        std::set<NeuralNodeId> _outputIds;
+        std::vector<NeuralNodeId> _inputIds;
+        std::vector<NeuralNodeId> _outputIds;
 
         class NeatActivityUnitImpl;
         std::unique_ptr<NeatActivityUnitImpl> _impl;

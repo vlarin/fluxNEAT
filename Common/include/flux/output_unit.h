@@ -21,7 +21,7 @@ namespace flux {
     protected:
         IOutputUnit(std::string id, std::shared_ptr<IContext> context) : IContextUnit(std::move(id), std::move(context)) {}
     public:
-        virtual std::set<NeuralNodeId> GetOutputIds() const = 0;
+        virtual std::vector<NeuralNodeId> GetOutputIds() const = 0;
 
         virtual void Apply(const std::map<flux::NeuralNodeId, flux::NeuralNode> &outputs) const = 0;
     };
