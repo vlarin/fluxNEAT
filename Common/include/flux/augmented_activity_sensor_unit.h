@@ -20,17 +20,21 @@ namespace flux {
      */
     class FLUX_API AugmentedActivitySensorUnit : public IAugmentedSensorUnit
     {
-    protected:
+    public:
         explicit AugmentedActivitySensorUnit(std::shared_ptr<IActivityUnit> activity, std::shared_ptr<IContext> context)
         : IAugmentedSensorUnit(activity->GetId(), std::move(context)), _activity(activity) {}
-    public:
-        virtual std::vector<NeuralNodeId> GetInputIds() const { return _activity->GetInputIds(); }
-        virtual std::vector<NeuralNodeId> GetAugmentedInputIds() const { return _activity->GetOutputIds(); }
 
-        virtual std::vector<NeuralNode> ApplyAugmentation(const std::vector<NeuralNode> &rawInputs) const
+        std::vector<NeuralNodeId> GetInputIds() const override { return _activity->GetInputIds(); }
+        std::vector<NeuralNodeId> GetAugmentedInputIds() const override { return _activity->GetOutputIds(); }
+
+        std::vector<NeuralNode> ApplyAugmentation(const std::vector<NeuralNode> &rawInputs) const override
         {
-            assert(_activity);
             return _activity->Activate(rawInputs);
+        }
+
+        std::shared_ptr<flux::IContextUnit> Clone(std::shared_ptr<IContext> context) const override
+        {
+            return CloneToContext<AugmentedActivitySensorUnit>(context);
         }
 
     private:
