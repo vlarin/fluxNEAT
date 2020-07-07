@@ -93,12 +93,65 @@ private:
     std::shared_ptr<ManualRawInputSensor> _origin;
 };
 
+void FillNeuronCubeIndices(const int i, int index, float weight, const std::vector<std::pair<int, float>> &preindices, std::vector<std::pair<int, float>> &indices)
+{
+    if (i >= preindices.size())
+    {
+        return;
+    }
+
+    index += preindices[i].first;
+    weight *= preindices[i].second;
+
+    int nextIndex = (i % 2 == 0) ? i + 2 : i + 1;
+    if (nextIndex >= preindices.size() && weight > 0.001)
+    {
+        indices.emplace_back(index, weight);
+    }
+
+    FillNeuronCubeIndices(nextIndex, index, weight, preindices, indices);
+    FillNeuronCubeIndices(nextIndex + 1, index, weight, preindices, indices);
+}
+
+std::vector<std::pair<int, float>> GetNeuronCubeIndices(std::vector<float> position, int length)
+{
+    std::vector<std::pair<int, float>> preindices {};
+    std::vector<std::pair<int, float>> indices {};
+
+    auto dimensionsCount = position.size();
+    int div = 1;
+    int modulus = length;
+
+    for (int i = 0; i < dimensionsCount; i++)
+    {
+        position[i] *= (length - 1);
+        if (position[i] >= (length - 1))
+        {
+            position[i] = length - 1.000001;
+        }
+
+        float rawPreIndex;
+        float weight = modf(position[i], &rawPreIndex);
+        preindices.emplace_back(rawPreIndex * div, 1.0 - weight);
+        preindices.emplace_back((rawPreIndex + 1) * div, weight);
+
+        div = modulus;
+        modulus *= length;
+    }
+
+    FillNeuronCubeIndices(0, 0, 1.0, preindices, indices);
+    FillNeuronCubeIndices(1, 0, 1.0, preindices, indices);
+
+    return indices;
+}
+
 int main()
 {
     cout << "Starting black box test..." << endl;
     auto context = std::make_shared<UnitContext>("Empty Context");
     std::shared_ptr<SingleActivityBlackBox> blackBox = std::make_shared<SingleActivityBlackBox>("test", context);
 
+    std::vector<std::pair<int, float>> test1 = GetNeuronCubeIndices(std::vector<float> { 1, 1, 1}, 9);
     NeuralNodeId inputA("topLeft"); // 1
     NeuralNodeId inputB("topRight");
     NeuralNodeId inputC("bottomLeft");

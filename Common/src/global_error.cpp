@@ -14,26 +14,28 @@ bool flux::hasErrors()
 
 void flux::resetErrors()
 {
+    delete[] LAST_ERROR;
     LAST_ERROR = nullptr;
 }
 
 void flux::setLastError(const char *what)
 {
-    //delete[] LAST_ERROR;
+    delete[] LAST_ERROR;
 
-    LAST_ERROR = const_cast<char *>(what);
+    LAST_ERROR = new char[strlen(what)];
+    snprintf(LAST_ERROR, strlen(LAST_ERROR), "%s", what);
 }
 
 void flux::setLastErrorF(const char *what, const char *context)
 {
-    //delete[] LAST_ERROR;
+    delete[] LAST_ERROR;
     LAST_ERROR = new char[strlen(what) + strlen(context)];
     snprintf(LAST_ERROR, strlen(LAST_ERROR), what, context);
 }
 
 void flux::setLastErrorD(const char *what, double context)
 {
-    //delete[] LAST_ERROR;
+    delete[] LAST_ERROR;
     LAST_ERROR = new char[strlen(what) + 20];
     snprintf(LAST_ERROR, strlen(LAST_ERROR), what, context);
 }

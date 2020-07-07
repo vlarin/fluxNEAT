@@ -40,6 +40,10 @@ void flux::SingleActivityBlackBox::Step()
     {
         input.second.Reset();
     }
+    for (auto &output : _responses)
+    {
+        output.second.Reset();
+    }
 
     for (const auto &input : _rawInputs)
     {
@@ -60,7 +64,7 @@ void flux::SingleActivityBlackBox::Step()
     for (const auto &input : _augmentedInputs)
     {
         std::vector<NeuralNode> augmentedPreInputs;
-        for (const auto &augmentedId : input->GetAugmentedInputIds())
+        for (const auto &augmentedId : input->GetInputIds())
         {
             if (_sensors.find(augmentedId) == _sensors.end())
             {
@@ -81,6 +85,15 @@ void flux::SingleActivityBlackBox::Step()
             else
             {
                 _sensors[rawInput.GetNodeId()].Apply(rawInput.GetValue());
+            }
+
+            if (_responses.find(rawInput.GetNodeId()) == _responses.end())
+            {
+                _responses.insert(std::make_pair(rawInput.GetNodeId(), rawInput));
+            }
+            else
+            {
+                _responses[rawInput.GetNodeId()].Apply(rawInput.GetValue());
             }
         }
     }
@@ -105,10 +118,6 @@ void flux::SingleActivityBlackBox::Step()
 
     std::vector<NeuralNode> outputs = _activityUnit->Activate(preInputs);
 
-    for (auto &output : _responses)
-    {
-        output.second.Reset();
-    }
     for (const auto &outputValue : outputs)
     {
         if (_responses.find(outputValue.GetNodeId()) == _responses.end())
